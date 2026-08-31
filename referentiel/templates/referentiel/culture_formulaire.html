@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load utilitaires %}
+{% block titre %}Culture{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 640px;">
+    <h1 class="h4 mb-3">{% if object %}Modifier{% else %}Ajouter{% endif %} une culture</h1>
+    <div class="card shadow-sm"><div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for champ in form %}
+            <div class="mb-3">
+                <label class="form-label">{{ champ.label }}</label>
+                {% if champ.name == 'sols_favorables' %}
+                    {{ champ }}
+                {% else %}
+                    {{ champ|add_class:"form-control" }}
+                {% endif %}
+                {% for e in champ.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-success">Enregistrer</button>
+        </form>
+    </div></div>
+</div>
+{% endblock %}

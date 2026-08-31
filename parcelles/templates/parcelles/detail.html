@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static l10n %}
+{% block titre %}{{ parcelle.nom }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">{{ parcelle.nom }}</h1>
+        <a href="{% url 'analyses:nouvelle' %}" class="btn btn-success"><i class="bi bi-cpu"></i> Nouvelle analyse</a>
+    </div>
+    <p class="text-muted">{{ parcelle.localite }} {% if parcelle.superficie_ha %}· {{ parcelle.superficie_ha }} ha{% endif %}</p>
+
+    <div id="mini-carte" class="carte-conteneur-mini mb-4"></div>
+
+    <h2 class="h5">Analyses realisees</h2>
+    <div class="table-responsive">
+        <table class="table table-striped bg-white">
+            <thead><tr><th>Date</th><th>Culture recommandee</th><th>pH</th><th>Confiance</th><th></th></tr></thead>
+            <tbody>
+            {% for a in parcelle.analyses.all %}
+                <tr>
+                    <td>{{ a.date_analyse|date:"d/m/Y H:i" }}</td>
+                    <td>{{ a.culture_predite.nom|default:"—" }}</td>
+                    <td>{{ a.ph }}</td>
+                    <td>{{ a.confiance_culture|default:"—" }}{% if a.confiance_culture %}%{% endif %}</td>
+                    <td><a href="{% url 'analyses:resultat' a.pk %}" class="btn btn-sm btn-outline-success">Voir</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-center text-muted">Aucune analyse pour cette parcelle.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+    const carte = L.map('mini-carte').setView([{{ parcelle.latitude|unlocalize }}, {{ parcelle.longitude|unlocalize }}], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(carte);
+    L.marker([{{ parcelle.latitude|unlocalize }}, {{ parcelle.longitude|unlocalize }}]).addTo(carte).bindPopup("{{ parcelle.nom|escapejs }}");
+</script>
+{% endblock %}

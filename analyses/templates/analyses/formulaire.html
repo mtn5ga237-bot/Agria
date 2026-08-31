@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load utilitaires %}
+{% block titre %}Analyser mon sol{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+    <h1 class="h3 mb-1"><i class="bi bi-cpu text-success"></i> Analyser mon sol</h1>
+    <p class="text-muted mb-4">Renseignez les parametres physico-chimiques mesures ou estimes. La prediction s'affiche en quelques secondes.</p>
+
+    {% if not form.fields.parcelle.queryset.exists %}
+        <div class="alert alert-warning">
+            Vous n'avez encore aucune parcelle. <a href="{% url 'parcelles:creer' %}">Creez-en une</a> avant de lancer une analyse.
+        </div>
+    {% else %}
+    <form method="post" enctype="multipart/form-data" class="card shadow-sm">
+        <div class="card-body">
+            {% for e in form.non_field_errors %}<div class="alert alert-danger">{{ e }}</div>{% endfor %}
+
+            <div class="mb-3">
+                <label class="form-label">Parcelle</label>
+                {{ form.parcelle|add_class:"form-select" }}
+            </div>
+
+            <div class="mb-3 p-3" style="background: var(--brand-soft); border-radius: var(--radius-sm); border: 1px dashed var(--border-strong);">
+                <label class="form-label mb-1"><i class="bi bi-camera text-success"></i> Photo du sol <span class="text-faint">(facultatif)</span></label>
+                {{ form.photo_sol|add_class:"form-control" }}
+                <div class="form-text">Si vous ajoutez une photo, AgriA identifie aussi le type de sol reel (Alluvial, Noir, Latérite...) et affine les recommandations.</div>
+            </div>
+
+            <h2 class="h6 text-success mt-4">Parametres du sol</h2>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">pH</label>
+                    {{ form.ph|add_class:"form-control" }}
+                    {% for e in form.ph.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Matiere organique (%)</label>
+                    {{ form.matiere_organique|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4"></div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Argile (%)</label>
+                    {{ form.argile|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Limon (%)</label>
+                    {{ form.limon|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Sable (%)</label>
+                    {{ form.sable|add_class:"form-control" }}
+                </div>
+                <div class="col-12 form-text">La somme argile + limon + sable doit avoisiner 100 % (facultatif si non mesure).</div>
+            </div>
+
+            <h2 class="h6 text-success mt-4">Elements nutritifs (mg/kg)</h2>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Azote (N)</label>
+                    {{ form.azote|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Phosphore (P)</label>
+                    {{ form.phosphore|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Potassium (K)</label>
+                    {{ form.potassium|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <h2 class="h6 text-success mt-4">Conditions climatiques</h2>
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Temperature (°C)</label>
+                    {{ form.temperature|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Humidite relative (%)</label>
+                    {{ form.humidite|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Pluviometrie annuelle (mm)</label>
+                    {{ form.pluviometrie|add_class:"form-control" }}
+                </div>
+            </div>
+
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success w-100">Lancer l'analyse</button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

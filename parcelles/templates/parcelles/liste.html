@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titre %}Mes parcelles{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0"><i class="bi bi-bounding-box text-success"></i> Mes parcelles</h1>
+        <a href="{% url 'parcelles:creer' %}" class="btn btn-success"><i class="bi bi-plus-lg"></i> Nouvelle parcelle</a>
+    </div>
+
+    <div class="row g-3">
+        {% for parcelle in parcelles %}
+        <div class="col-md-4 reveal">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ parcelle.nom }}</h5>
+                    <p class="card-text text-muted mb-1"><i class="bi bi-geo-alt"></i> {{ parcelle.localite|default:"Localite non renseignee" }}</p>
+                    {% if parcelle.superficie_ha %}<p class="card-text small">{{ parcelle.superficie_ha }} ha</p>{% endif %}
+                    <p class="card-text small text-muted">{{ parcelle.analyses.count }} analyse(s)</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between" style="border-color: var(--border);">
+                    <a href="{% url 'parcelles:detail' parcelle.pk %}" class="btn btn-sm btn-outline-success">Voir</a>
+                    <a href="{% url 'parcelles:supprimer' parcelle.pk %}" class="btn btn-sm btn-outline-danger">Supprimer</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        {% url 'parcelles:creer' as url_creer %}
+        {% include "partiels/etat_vide.html" with icone="bi-bounding-box" titre="Aucune parcelle pour le moment" message="Enregistrez votre premiere parcelle pour pouvoir lancer une analyse de sol." lien_url=url_creer lien_texte="Creer une parcelle" %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

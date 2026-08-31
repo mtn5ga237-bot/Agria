@@ -1,0 +1,93 @@
+{% load static %}
+<button class="assistant-bubble" id="assistant-bouton" type="button" aria-label="Ouvrir l'assistant AgriA" title="Assistant AgriA">
+    <i class="bi bi-stars"></i>
+</button>
+
+<div class="assistant-panel" id="assistant-panneau" role="dialog" aria-label="Assistant AgriA">
+    <div class="assistant-header">
+        <span class="brand-icon" style="width:32px;height:32px;font-size:.95rem;"><i class="bi bi-stars"></i></span>
+        <div>
+            <div class="fw-semibold" style="font-family: var(--font-heading);">Assistant AgriA</div>
+            <div class="small text-faint">Pose une question sur l'analyse, les cultures ou la plateforme</div>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary ms-auto" id="assistant-reinitialiser" title="Nouvelle conversation"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="btn btn-sm btn-outline-secondary" id="assistant-fermer" title="Fermer"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="assistant-messages" id="assistant-messages">
+        <div class="assistant-msg assistant">
+            Bonjour 👋 Je suis l'assistant AgriA. Je peux vous aider a comprendre une prediction, une recommandation de culture, ou le fonctionnement de la plateforme. Que puis-je faire pour vous ?
+        </div>
+    </div>
+    <form class="assistant-input-row" id="assistant-formulaire">
+        <textarea id="assistant-saisie" class="form-control" placeholder="Ecrivez votre question..." rows="1"></textarea>
+        <button type="submit" class="btn btn-success" id="assistant-envoyer"><i class="bi bi-send"></i></button>
+    </form>
+</div>
+
+<script>
+(function () {
+    const bouton = document.getElementById('assistant-bouton');
+    const panneau = document.getElementById('assistant-panneau');
+    const fermer = document.getElementById('assistant-fermer');
+    const reinit = document.getElementById('assistant-reinitialiser');
+    const messagesConteneur = document.getElementById('assistant-messages');
+    const formulaire = document.getElementById('assistant-formulaire');
+    const saisie = document.getElementById('assistant-saisie');
+
+    function basculer() { panneau.classList.toggle('ouvert'); if (panneau.classList.contains('ouvert')) saisie.focus(); }
+    bouton.addEventListener('click', basculer);
+    fermer.addEventListener('click', basculer);
+
+    function ajouterMessage(texte, role) {
+        const div = document.createElement('div');
+        div.className = 'assistant-msg ' + role;
+        div.textContent = texte;
+        messagesConteneur.appendChild(div);
+        messagesConteneur.scrollTop = messagesConteneur.scrollHeight;
+        return div;
+    }
+
+    function getCookie(nom) {
+        const valeur = `; ${document.cookie}`;
+        const parties = valeur.split(`; ${nom}=`);
+        if (parties.length === 2) return parties.pop().split(';').shift();
+    }
+
+    formulaire.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const texte = saisie.value.trim();
+        if (!texte) return;
+        ajouterMessage(texte, 'utilisateur');
+        saisie.value = '';
+        const chargement = ajouterMessage('Reflexion en cours...', 'chargement');
+
+        try {
+            const reponse = await fetch("{% url 'assistant:discuter' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify({ message: texte }),
+            });
+            const donnees = await reponse.json();
+            chargement.remove();
+            if (!reponse.ok) {
+                ajouterMessage(donnees.erreur || "Une erreur est survenue.", 'assistant');
+                return;
+            }
+            ajouterMessage(donnees.reponse, 'assistant');
+        } catch (err) {
+            chargement.remove();
+            ajouterMessage("Connexion impossible pour le moment. Reessayez.", 'assistant');
+        }
+    });
+
+    saisie.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); formulaire.requestSubmit(); }
+    });
+
+    reinit.addEventListener('click', async () => {
+        await fetch("{% url 'assistant:reinitialiser' %}", { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } });
+        messagesConteneur.innerHTML = '';
+        ajouterMessage("Nouvelle conversation. Que puis-je faire pour vous ?", 'assistant');
+    });
+})();
+</script>

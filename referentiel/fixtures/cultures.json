@@ -1,0 +1,464 @@
+[
+  {
+    "model": "referentiel.culture",
+    "pk": 1,
+    "fields": {
+      "code": "apple",
+      "nom": "Pomme",
+      "nom_scientifique": "Malus domestica",
+      "ph_min": 5.51,
+      "ph_max": 6.5,
+      "cycle_jours": 150,
+      "besoin_azote": 24.0,
+      "besoin_phosphore": 136.5,
+      "besoin_potassium": 200.0,
+      "couleur_hex": "#d32f2f",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du pomme.",
+      "sols_favorables": [
+        5
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 2,
+    "fields": {
+      "code": "banana",
+      "nom": "Banane",
+      "nom_scientifique": "Musa spp.",
+      "ph_min": 5.51,
+      "ph_max": 6.49,
+      "cycle_jours": 300,
+      "besoin_azote": 100.5,
+      "besoin_phosphore": 81.0,
+      "besoin_potassium": 50.0,
+      "couleur_hex": "#fbc02d",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du banane.",
+      "sols_favorables": [
+        1,
+        4
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 3,
+    "fields": {
+      "code": "blackgram",
+      "nom": "Haricot noir",
+      "nom_scientifique": "Vigna mungo",
+      "ph_min": 6.5,
+      "ph_max": 7.78,
+      "cycle_jours": 90,
+      "besoin_azote": 41.0,
+      "besoin_phosphore": 67.0,
+      "besoin_potassium": 19.0,
+      "couleur_hex": "#424242",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du haricot noir.",
+      "sols_favorables": [
+        3,
+        1
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 4,
+    "fields": {
+      "code": "chickpea",
+      "nom": "Pois chiche",
+      "nom_scientifique": "Cicer arietinum",
+      "ph_min": 5.99,
+      "ph_max": 8.87,
+      "cycle_jours": 100,
+      "besoin_azote": 39.0,
+      "besoin_phosphore": 68.0,
+      "besoin_potassium": 79.0,
+      "couleur_hex": "#8d6e63",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du pois chiche.",
+      "sols_favorables": [
+        3,
+        1
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 5,
+    "fields": {
+      "code": "coconut",
+      "nom": "Noix de coco",
+      "nom_scientifique": "Cocos nucifera",
+      "ph_min": 5.5,
+      "ph_max": 6.47,
+      "cycle_jours": 365,
+      "besoin_azote": 24.0,
+      "besoin_phosphore": 15.5,
+      "besoin_potassium": 31.0,
+      "couleur_hex": "#795548",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du noix de coco.",
+      "sols_favorables": [
+        4,
+        1
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 6,
+    "fields": {
+      "code": "coffee",
+      "nom": "Cafe",
+      "nom_scientifique": "Coffea arabica",
+      "ph_min": 6.02,
+      "ph_max": 7.49,
+      "cycle_jours": 270,
+      "besoin_azote": 103.0,
+      "besoin_phosphore": 29.0,
+      "besoin_potassium": 30.0,
+      "couleur_hex": "#4e342e",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du cafe.",
+      "sols_favorables": [
+        4,
+        5
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 7,
+    "fields": {
+      "code": "cotton",
+      "nom": "Coton",
+      "nom_scientifique": "Gossypium hirsutum",
+      "ph_min": 5.8,
+      "ph_max": 7.99,
+      "cycle_jours": 180,
+      "besoin_azote": 117.0,
+      "besoin_phosphore": 46.0,
+      "besoin_potassium": 19.0,
+      "couleur_hex": "#1565c0",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du coton.",
+      "sols_favorables": [
+        3,
+        1
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 8,
+    "fields": {
+      "code": "grapes",
+      "nom": "Raisin",
+      "nom_scientifique": "Vitis vinifera",
+      "ph_min": 5.51,
+      "ph_max": 6.5,
+      "cycle_jours": 150,
+      "besoin_azote": 24.0,
+      "besoin_phosphore": 133.0,
+      "besoin_potassium": 201.0,
+      "couleur_hex": "#6a1b9a",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du raisin.",
+      "sols_favorables": [
+        3,
+        6
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 9,
+    "fields": {
+      "code": "jute",
+      "nom": "Jute",
+      "nom_scientifique": "Corchorus olitorius",
+      "ph_min": 6.0,
+      "ph_max": 7.49,
+      "cycle_jours": 120,
+      "besoin_azote": 78.0,
+      "besoin_phosphore": 46.0,
+      "besoin_potassium": 40.0,
+      "couleur_hex": "#558b2f",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du jute.",
+      "sols_favorables": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 10,
+    "fields": {
+      "code": "kidneybeans",
+      "nom": "Haricot rouge",
+      "nom_scientifique": "Phaseolus vulgaris",
+      "ph_min": 5.5,
+      "ph_max": 6.0,
+      "cycle_jours": 90,
+      "besoin_azote": 22.0,
+      "besoin_phosphore": 67.0,
+      "besoin_potassium": 20.0,
+      "couleur_hex": "#c62828",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du haricot rouge.",
+      "sols_favorables": [
+        1,
+        5
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 11,
+    "fields": {
+      "code": "lentil",
+      "nom": "Lentille",
+      "nom_scientifique": "Lens culinaris",
+      "ph_min": 5.92,
+      "ph_max": 7.84,
+      "cycle_jours": 110,
+      "besoin_azote": 16.5,
+      "besoin_phosphore": 68.0,
+      "besoin_potassium": 19.0,
+      "couleur_hex": "#8e7cc3",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du lentille.",
+      "sols_favorables": [
+        1,
+        3
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 12,
+    "fields": {
+      "code": "maize",
+      "nom": "Mais",
+      "nom_scientifique": "Zea mays",
+      "ph_min": 5.51,
+      "ph_max": 7.0,
+      "cycle_jours": 100,
+      "besoin_azote": 76.0,
+      "besoin_phosphore": 48.5,
+      "besoin_potassium": 20.0,
+      "couleur_hex": "#fdd835",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du mais.",
+      "sols_favorables": [
+        1,
+        3,
+        6
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 13,
+    "fields": {
+      "code": "mango",
+      "nom": "Mangue",
+      "nom_scientifique": "Mangifera indica",
+      "ph_min": 4.51,
+      "ph_max": 6.97,
+      "cycle_jours": 150,
+      "besoin_azote": 21.0,
+      "besoin_phosphore": 27.5,
+      "besoin_potassium": 30.0,
+      "couleur_hex": "#ef6c00",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du mangue.",
+      "sols_favorables": [
+        4,
+        6,
+        1
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 14,
+    "fields": {
+      "code": "mothbeans",
+      "nom": "Haricot moth",
+      "nom_scientifique": "Vigna aconitifolia",
+      "ph_min": 3.5,
+      "ph_max": 9.94,
+      "cycle_jours": 75,
+      "besoin_azote": 22.0,
+      "besoin_phosphore": 48.5,
+      "besoin_potassium": 20.0,
+      "couleur_hex": "#a1887f",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du haricot moth.",
+      "sols_favorables": [
+        2,
+        6
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 15,
+    "fields": {
+      "code": "mungbean",
+      "nom": "Haricot mungo",
+      "nom_scientifique": "Vigna radiata",
+      "ph_min": 6.22,
+      "ph_max": 7.2,
+      "cycle_jours": 65,
+      "besoin_azote": 22.0,
+      "besoin_phosphore": 47.0,
+      "besoin_potassium": 20.0,
+      "couleur_hex": "#9ccc65",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du haricot mungo.",
+      "sols_favorables": [
+        1,
+        6
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 16,
+    "fields": {
+      "code": "muskmelon",
+      "nom": "Melon",
+      "nom_scientifique": "Cucumis melo",
+      "ph_min": 6.0,
+      "ph_max": 6.78,
+      "cycle_jours": 80,
+      "besoin_azote": 100.0,
+      "besoin_phosphore": 18.0,
+      "besoin_potassium": 50.0,
+      "couleur_hex": "#ffb300",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du melon.",
+      "sols_favorables": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 17,
+    "fields": {
+      "code": "orange",
+      "nom": "Orange",
+      "nom_scientifique": "Citrus sinensis",
+      "ph_min": 6.01,
+      "ph_max": 8.0,
+      "cycle_jours": 240,
+      "besoin_azote": 19.0,
+      "besoin_phosphore": 16.0,
+      "besoin_potassium": 10.0,
+      "couleur_hex": "#fb8c00",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du orange.",
+      "sols_favorables": [
+        6,
+        1
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 18,
+    "fields": {
+      "code": "papaya",
+      "nom": "Papaye",
+      "nom_scientifique": "Carica papaya",
+      "ph_min": 6.5,
+      "ph_max": 6.99,
+      "cycle_jours": 270,
+      "besoin_azote": 49.0,
+      "besoin_phosphore": 60.0,
+      "besoin_potassium": 50.0,
+      "couleur_hex": "#7cb342",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du papaye.",
+      "sols_favorables": [
+        4,
+        1
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 19,
+    "fields": {
+      "code": "pigeonpeas",
+      "nom": "Pois d'Angole",
+      "nom_scientifique": "Cajanus cajan",
+      "ph_min": 4.55,
+      "ph_max": 7.45,
+      "cycle_jours": 150,
+      "besoin_azote": 20.0,
+      "besoin_phosphore": 69.5,
+      "besoin_potassium": 20.0,
+      "couleur_hex": "#6d4c41",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du pois d'angole.",
+      "sols_favorables": [
+        6,
+        3
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 20,
+    "fields": {
+      "code": "pomegranate",
+      "nom": "Grenade",
+      "nom_scientifique": "Punica granatum",
+      "ph_min": 5.56,
+      "ph_max": 7.2,
+      "cycle_jours": 180,
+      "besoin_azote": 18.0,
+      "besoin_phosphore": 20.0,
+      "besoin_potassium": 40.0,
+      "couleur_hex": "#ad1457",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du grenade.",
+      "sols_favorables": [
+        2,
+        6
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 21,
+    "fields": {
+      "code": "rice",
+      "nom": "Riz",
+      "nom_scientifique": "Oryza sativa",
+      "ph_min": 5.01,
+      "ph_max": 7.87,
+      "cycle_jours": 120,
+      "besoin_azote": 80.0,
+      "besoin_phosphore": 47.0,
+      "besoin_potassium": 40.0,
+      "couleur_hex": "#2e7d32",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du riz.",
+      "sols_favorables": [
+        1,
+        3
+      ]
+    }
+  },
+  {
+    "model": "referentiel.culture",
+    "pk": 22,
+    "fields": {
+      "code": "watermelon",
+      "nom": "Pasteque",
+      "nom_scientifique": "Citrullus lanatus",
+      "ph_min": 6.0,
+      "ph_max": 6.96,
+      "cycle_jours": 85,
+      "besoin_azote": 99.0,
+      "besoin_phosphore": 17.5,
+      "besoin_potassium": 50.5,
+      "couleur_hex": "#43a047",
+      "description": "Culture recommandee par le modele de classification pour un sol aux parametres proches de ceux du pasteque.",
+      "sols_favorables": [
+        1,
+        6
+      ]
+    }
+  }
+]

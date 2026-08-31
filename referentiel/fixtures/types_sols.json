@@ -1,0 +1,86 @@
+[
+  {
+    "model": "referentiel.typesol",
+    "pk": 1,
+    "fields": {
+      "code": "Alluvial_Soil",
+      "libelle": "Sol alluvial",
+      "description": "Sol fertile depose par les cours d'eau, riche en limon, texture equilibree.",
+      "ph_min": 6.0,
+      "ph_max": 7.5,
+      "couleur_hex": "#8d6e63"
+    }
+  },
+  {
+    "model": "referentiel.typesol",
+    "pk": 2,
+    "fields": {
+      "code": "Arid_Soil",
+      "libelle": "Sol aride",
+      "description": "Sol pauvre en matiere organique, faible retention d'eau, typique des zones seches.",
+      "ph_min": 7.5,
+      "ph_max": 9.0,
+      "couleur_hex": "#d7ccc8"
+    }
+  },
+  {
+    "model": "referentiel.typesol",
+    "pk": 3,
+    "fields": {
+      "code": "Black_Soil",
+      "libelle": "Sol noir (regur)",
+      "description": "Sol argileux riche en fer et magnesium, forte retention hydrique.",
+      "ph_min": 6.5,
+      "ph_max": 8.0,
+      "couleur_hex": "#3e2723"
+    }
+  },
+  {
+    "model": "referentiel.typesol",
+    "pk": 4,
+    "fields": {
+      "code": "Laterite_Soil",
+      "libelle": "Sol lateritique",
+      "description": "Sol tropical lessive, riche en oxydes de fer et d'aluminium, pauvre en nutriments.",
+      "ph_min": 5.0,
+      "ph_max": 6.5,
+      "couleur_hex": "#bf360c"
+    }
+  },
+  {
+    "model": "referentiel.typesol",
+    "pk": 5,
+    "fields": {
+      "code": "Mountain_Soil",
+      "libelle": "Sol de montagne",
+      "description": "Sol peu profond et caillouteux, forme sur pente, riche en matiere organique en surface.",
+      "ph_min": 5.5,
+      "ph_max": 7.0,
+      "couleur_hex": "#6d4c41"
+    }
+  },
+  {
+    "model": "referentiel.typesol",
+    "pk": 6,
+    "fields": {
+      "code": "Red_Soil",
+      "libelle": "Sol rouge",
+      "description": "Sol riche en oxyde de fer, texture legère, drainage rapide, pauvre en azote.",
+      "ph_min": 5.5,
+      "ph_max": 7.0,
+      "couleur_hex": "#c62828"
+    }
+  },
+  {
+    "model": "referentiel.typesol",
+    "pk": 7,
+    "fields": {
+      "code": "Yellow_Soil",
+      "libelle": "Sol jaune",
+      "description": "Variante hydratee du sol rouge, drainage limite, acidite marquee.",
+      "ph_min": 5.0,
+      "ph_max": 6.5,
+      "couleur_hex": "#f9a825"
+    }
+  }
+]

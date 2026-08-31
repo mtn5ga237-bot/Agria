@@ -1,0 +1,13 @@
+Bonjour {{ user.nom_complet }},
+
+Vous avez demande la reinitialisation de votre mot de passe sur AgriA.
+
+Cliquez sur le lien suivant pour choisir un nouveau mot de passe (valable 2 heures, usage unique) :
+
+{{ protocol }}://{{ domain }}{% url 'comptes:reinitialisation_mdp_confirmer' uidb64=uid token=token %}
+
+Si vous n'etes pas a l'origine de cette demande, ignorez simplement cet email : votre mot de passe
+actuel reste inchange.
+
+— L'equipe AgriA
+Inspection Regionale de Pedagogie chargee de l'enseignement de l'Informatique du Nord, Garoua

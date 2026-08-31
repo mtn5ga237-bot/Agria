@@ -1,0 +1,108 @@
+{% load static %}
+<script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/gsap/gsap.min.js' %}"></script>
+<script src="{% static 'vendor/gsap/ScrollTrigger.min.js' %}"></script>
+<script>
+    (function () {
+        const racine = document.documentElement;
+        const bouton = document.getElementById('bouton-theme');
+        const icone = document.getElementById('icone-theme');
+        function majIcone() {
+            if (!icone) return;
+            const clair = racine.getAttribute('data-theme') === 'light';
+            icone.className = clair ? 'bi bi-sun' : 'bi bi-moon-stars';
+        }
+        majIcone();
+        if (bouton) {
+            bouton.addEventListener('click', () => {
+                const nouveau = racine.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                racine.setAttribute('data-theme', nouveau);
+                try { localStorage.setItem('agria-theme', nouveau); } catch (e) {}
+                majIcone();
+            });
+        }
+    })();
+
+    // Fond ambiant (deux halos flous), insere une seule fois par page.
+    if (!document.querySelector('.fond-ambiant')) {
+        const fond = document.createElement('div');
+        fond.className = 'fond-ambiant';
+        fond.innerHTML = '<span></span><span></span><span></span>';
+        document.body.prepend(fond);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const reduitAnimation = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const elements = document.querySelectorAll('.reveal');
+
+        if (reduitAnimation || typeof gsap === 'undefined') {
+            elements.forEach((el) => el.classList.add('is-visible'));
+        } else {
+            gsap.registerPlugin(ScrollTrigger);
+            elements.forEach((el, i) => {
+                gsap.fromTo(el,
+                    { opacity: 0, y: 22 },
+                    {
+                        opacity: 1, y: 0, duration: .6, ease: 'power3.out',
+                        delay: Math.min(i * 0.05, 0.3),
+                        scrollTrigger: { trigger: el, start: 'top 92%', once: true },
+                    }
+                );
+            });
+
+            // Compteurs animes : <span data-compteur="94.55">0</span>
+            document.querySelectorAll('[data-compteur]').forEach((el) => {
+                const cible = parseFloat(el.dataset.compteur);
+                const decimales = (el.dataset.compteur.split('.')[1] || '').length;
+                const valeur = { n: 0 };
+                ScrollTrigger.create({
+                    trigger: el, start: 'top 95%', once: true,
+                    onEnter: () => gsap.to(valeur, {
+                        n: cible, duration: 1.4, ease: 'power2.out',
+                        onUpdate: () => { el.textContent = valeur.n.toFixed(decimales); },
+                    }),
+                });
+            });
+
+            // Titre anime mot par mot : <h1 data-titre-anime>Texte court</h1> (sans plugin payant SplitText).
+            // Parcourt les noeuds enfants directs : un noeud texte est decoupe mot par mot, un element
+            // existant (ex. <span class="gradient-text">) est conserve intact et anime comme un seul bloc
+            // pour ne pas casser son propre degrade (background-clip: text ne s'applique qu'a l'element
+            // qui porte le fond ; le fractionner aurait rendu son texte invisible).
+            document.querySelectorAll('[data-titre-anime]').forEach((titre) => {
+                Array.from(titre.childNodes).forEach((noeud) => {
+                    if (noeud.nodeType === Node.TEXT_NODE) {
+                        const fragment = document.createDocumentFragment();
+                        noeud.textContent.split(/(\s+)/).forEach((jeton) => {
+                            if (jeton.trim() === '') { fragment.appendChild(document.createTextNode(jeton)); return; }
+                            const span = document.createElement('span');
+                            span.className = 'mot-anime';
+                            span.style.display = 'inline-block';
+                            span.textContent = jeton;
+                            fragment.appendChild(span);
+                        });
+                        noeud.replaceWith(fragment);
+                    } else if (noeud.nodeType === Node.ELEMENT_NODE) {
+                        noeud.classList.add('mot-anime');
+                        noeud.style.display = noeud.style.display || 'inline-block';
+                    }
+                });
+                gsap.from(titre.querySelectorAll('.mot-anime'), {
+                    opacity: 0, y: 24, rotateX: -35, duration: .7, stagger: .045, ease: 'expo.out', delay: .1,
+                });
+            });
+
+            // Boutons magnetiques : <a data-magnetique> suit le curseur avec une inertie elastique.
+            document.querySelectorAll('[data-magnetique]').forEach((el) => {
+                const xTo = gsap.quickTo(el, 'x', { duration: .4, ease: 'elastic.out(1, 0.4)' });
+                const yTo = gsap.quickTo(el, 'y', { duration: .4, ease: 'elastic.out(1, 0.4)' });
+                el.addEventListener('mousemove', (e) => {
+                    const r = el.getBoundingClientRect();
+                    xTo((e.clientX - r.left - r.width / 2) * .3);
+                    yTo((e.clientY - r.top - r.height / 2) * .3);
+                });
+                el.addEventListener('mouseleave', () => { xTo(0); yTo(0); });
+            });
+        }
+    });
+</script>

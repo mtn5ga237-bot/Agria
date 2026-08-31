@@ -1,0 +1,93 @@
+{% load static utilitaires %}
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    {% include "partiels/tete.html" %}
+    <title>{% block titre %}AgriA{% endblock %} — Analyse et classification des sols</title>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="topbar navbar navbar-expand-lg">
+    <div class="container-fluid px-3 px-lg-4">
+        <button class="btn btn-outline-secondary d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuLateral" aria-label="Ouvrir le menu">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+        <a class="brand-mark navbar-brand" href="{% url 'tableaux_de_bord:accueil' %}">
+            <span class="brand-icon"><i class="bi bi-flower1"></i></span>AgriA
+        </a>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <button class="theme-toggle" id="bouton-theme" type="button" aria-label="Changer de theme" title="Changer de theme">
+                <i class="bi bi-moon-stars" id="icone-theme"></i>
+            </button>
+            <span class="text-muted small d-none d-md-inline mx-2">{{ user.nom_complet }} · {{ user.get_role_display }}</span>
+            <a href="{% url 'comptes:profil' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-person-circle"></i> <span class="d-none d-sm-inline">Profil</span></a>
+            <form method="post" action="{% url 'comptes:deconnexion' %}" class="mb-0">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger" type="submit" title="Deconnexion"><i class="bi bi-box-arrow-right"></i></button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="app-shell">
+    <div class="offcanvas-lg offcanvas-start sidebar" tabindex="-1" id="menuLateral">
+        <div class="offcanvas-body p-0 d-flex flex-column h-100">
+            <nav class="flex-grow-1">
+                <div class="nav-section-label">Espace de travail</div>
+                <a class="side-link {% actif_si '/tableau-de-bord/' %}" href="{% url 'tableaux_de_bord:accueil' %}"><i class="bi bi-grid-1x2"></i> Tableau de bord</a>
+                <a class="side-link {% actif_si '/analyses/' %}" href="{% url 'analyses:nouvelle' %}"><i class="bi bi-cpu"></i> Analyser mon sol</a>
+                <a class="side-link {% actif_si '/parcelles/' %}" href="{% url 'parcelles:liste' %}"><i class="bi bi-bounding-box"></i> Mes parcelles</a>
+                <a class="side-link {% actif_si '/carte/' %}" href="{% url 'cartographie:carte' %}"><i class="bi bi-geo-alt"></i> Carte</a>
+                <a class="side-link {% actif_si '/analyses/historique' %}" href="{% url 'analyses:historique' %}"><i class="bi bi-clock-history"></i> Historique</a>
+
+                {% if est_agent %}
+                <div class="nav-section-label">Vulgarisation</div>
+                <a class="side-link {% actif_si '/comptes/producteurs' %}" href="{% url 'comptes:mes_producteurs' %}"><i class="bi bi-people"></i> Mes producteurs</a>
+                {% endif %}
+
+                {% if est_expert or est_administrateur %}
+                <div class="nav-section-label">Expertise</div>
+                <a class="side-link {% actif_si '/referentiel/sols' %}" href="{% url 'referentiel:types_sols' %}"><i class="bi bi-droplet-half"></i> Referentiel des sols</a>
+                <a class="side-link {% actif_si '/referentiel/cultures' %}" href="{% url 'referentiel:cultures' %}"><i class="bi bi-flower2"></i> Referentiel des cultures</a>
+                <a class="side-link {% actif_si '/intelligence/versions' %}" href="{% url 'intelligence:historique_versions' %}"><i class="bi bi-diagram-3"></i> Versions du modele</a>
+                <a class="side-link {% actif_si '/intelligence/reentrainer' %}" href="{% url 'intelligence:reentrainer' %}"><i class="bi bi-arrow-repeat"></i> Reentrainer le modele</a>
+                {% endif %}
+
+                {% if est_administrateur %}
+                <div class="nav-section-label">Administration</div>
+                <a class="side-link {% actif_si '/comptes/utilisateurs' %}" href="{% url 'comptes:gestion_utilisateurs' %}"><i class="bi bi-people"></i> Utilisateurs</a>
+                <a class="side-link {% actif_si '/comptes/journal' %}" href="{% url 'comptes:journal_activite' %}"><i class="bi bi-shield-lock"></i> Journal d'activite</a>
+                <a class="side-link" href="/admin/"><i class="bi bi-gear"></i> Administration Django</a>
+                {% endif %}
+            </nav>
+            <div class="p-3 small text-faint border-top" style="border-color: var(--border);">
+                AgriA v1 · IAI-Cameroun, Garoua
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+                    <i class="bi bi-info-circle"></i> <div>{{ message }}</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if request.resolver_match.url_name != 'accueil' %}
+        <button type="button" onclick="if (document.referrer.indexOf(window.location.origin) === 0) { history.back(); } else { window.location.href = '{% url 'tableaux_de_bord:accueil' %}'; }" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Retour
+        </button>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+{% include "partiels/assistant.html" %}
+
+{% include "partiels/scripts.html" %}
+{% block extra_js %}{% endblock %}
+</body>
+</html>

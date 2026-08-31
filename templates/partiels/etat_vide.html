@@ -1,0 +1,9 @@
+{# Utilisation : {% include "partiels/etat_vide.html" with icone="bi-bounding-box" titre="..." message="..." lien_url="..." lien_texte="..." %} #}
+<div class="col-12">
+    <div class="glass-card text-center py-5 px-4 reveal">
+        <div class="mb-3" style="font-size: 2.8rem; color: var(--text-faint);"><i class="bi {{ icone }}"></i></div>
+        <h3 class="h5 font-heading mb-2">{{ titre }}</h3>
+        <p class="text-muted small mb-3" style="max-width: 420px; margin-inline: auto;">{{ message }}</p>
+        {% if lien_url %}<a href="{{ lien_url }}" class="btn btn-success btn-sm"><i class="bi bi-plus-lg"></i> {{ lien_texte }}</a>{% endif %}
+    </div>
+</div>

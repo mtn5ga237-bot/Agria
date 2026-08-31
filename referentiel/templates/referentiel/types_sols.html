@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block titre %}Referentiel des types de sols{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0"><i class="bi bi-droplet-half text-accent"></i> Referentiel des types de sols</h1>
+        <a href="{% url 'referentiel:creer_type_sol' %}" class="btn btn-success"><i class="bi bi-plus-lg"></i> Ajouter un type de sol</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped bg-white align-middle">
+            <thead><tr><th>Couleur</th><th>Libelle</th><th>Code</th><th>pH min</th><th>pH max</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for t in types_sols %}
+                <tr>
+                    <td><span class="d-inline-block rounded-circle" style="width:1rem;height:1rem;background:{{ t.couleur_hex }}"></span></td>
+                    <td>{{ t.libelle }}</td>
+                    <td><code>{{ t.code }}</code></td>
+                    <td>{{ t.ph_min }}</td>
+                    <td>{{ t.ph_max }}</td>
+                    <td>
+                        <a href="{% url 'referentiel:modifier_type_sol' t.pk %}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        <a href="{% url 'referentiel:supprimer_type_sol' t.pk %}" class="btn btn-sm btn-outline-danger">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

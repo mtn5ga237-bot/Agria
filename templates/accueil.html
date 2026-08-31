@@ -1,0 +1,179 @@
+{% extends "base_public.html" %}
+{% load static utilitaires %}
+{% block titre %}Accueil{% endblock %}
+{% block content %}
+
+<section class="container py-5 position-relative">
+    <div class="grille-tech"></div>
+    <div class="row align-items-center g-5 position-relative">
+        <div class="col-lg-6 reveal">
+            <div class="feature-pill mb-3"><i class="bi bi-cpu"></i> Random Forest · 98,9% d'exactitude</div>
+            <h1 class="display-4 font-heading fw-bold mb-3" data-titre-anime>
+                L'IA au service de <span class="gradient-text">vos parcelles</span>
+            </h1>
+            <p class="lead text-muted mb-4">
+                AgriA analyse les parametres physico-chimiques de votre sol et recommande, en quelques
+                secondes, les cultures les mieux adaptees — avec un score de compatibilite, un indice
+                de confiance, et l'appui d'un expert pedologue en cas de doute.
+            </p>
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                <a href="{% url 'comptes:inscription' %}" class="btn btn-success btn-lg px-4" data-magnetique><i class="bi bi-rocket-takeoff"></i> Commencer gratuitement</a>
+                <a href="#comment-ca-marche" class="btn btn-outline-secondary btn-lg px-4">Comment ca marche</a>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="feature-pill"><i class="bi bi-geo-alt"></i> Carte interactive</span>
+                <span class="feature-pill"><i class="bi bi-shield-check"></i> Donnees securisees</span>
+                <span class="feature-pill"><i class="bi bi-translate"></i> 100% en francais</span>
+                <span class="feature-pill"><i class="bi bi-stars"></i> Assistant IA integre</span>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="hero-canvas-wrap holo-bordure reveal" style="height: 420px;">
+                <div id="hero-3d" style="width:100%; height:100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="ticker-conteneur mt-5 pt-4 reveal" style="border-top: 1px solid var(--border);">
+        <div class="ticker-piste">
+            {% for c in "Riz,Mais,Coton,Cafe,Banane,Mangue,Raisin,Pasteque,Melon,Pomme,Orange,Papaye,Noix de coco,Jute,Grenade,Haricot rouge,Haricot noir,Haricot mungo,Pois chiche,Pois d'Angole,Lentille,Haricot moth"|split:"," %}
+                <span><i class="bi bi-check2-circle"></i>{{ c }}</span>
+            {% endfor %}
+            {% for c in "Riz,Mais,Coton,Cafe,Banane,Mangue,Raisin,Pasteque,Melon,Pomme,Orange,Papaye,Noix de coco,Jute,Grenade,Haricot rouge,Haricot noir,Haricot mungo,Pois chiche,Pois d'Angole,Lentille,Haricot moth"|split:"," %}
+                <span aria-hidden="true"><i class="bi bi-check2-circle"></i>{{ c }}</span>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="container pb-4">
+    <div class="row g-4 text-center">
+        <div class="col-6 col-md-3 reveal">
+            <div class="h1 font-heading fw-bold gradient-text mb-0"><span data-compteur="98.86">0</span>%</div>
+            <div class="text-muted small">Exactitude du modele</div>
+        </div>
+        <div class="col-6 col-md-3 reveal">
+            <div class="h1 font-heading fw-bold gradient-text mb-0"><span data-compteur="22">0</span></div>
+            <div class="text-muted small">Cultures couvertes</div>
+        </div>
+        <div class="col-6 col-md-3 reveal">
+            <div class="h1 font-heading fw-bold gradient-text mb-0"><span data-compteur="4">0</span></div>
+            <div class="text-muted small">Profils utilisateurs</div>
+        </div>
+        <div class="col-6 col-md-3 reveal">
+            <div class="h1 font-heading fw-bold gradient-text mb-0">&lt;<span data-compteur="2">0</span>s</div>
+            <div class="text-muted small">Temps de reponse</div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5" id="comment-ca-marche">
+    <div class="text-center mb-5 reveal">
+        <h2 class="font-heading fw-bold">Trois etapes vers une recommandation fiable</h2>
+        <p class="text-muted">Aucune analyse de laboratoire requise : des parametres simples suffisent.</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card p-4 h-100 reveal">
+                <div class="stat-icon tint-brand mb-3"><i class="bi bi-pencil-square"></i></div>
+                <h3 class="h5 font-heading">1. Renseignez les parametres</h3>
+                <p class="text-muted small mb-0">pH, azote, phosphore, potassium, temperature, humidite et pluviometrie de votre parcelle.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 h-100 reveal">
+                <div class="stat-icon tint-accent mb-3"><i class="bi bi-cpu"></i></div>
+                <h3 class="h5 font-heading">2. L'IA analyse</h3>
+                <p class="text-muted small mb-0">Un modele Random Forest entraine identifie la culture la plus adaptee, avec un indice de confiance.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 h-100 reveal">
+                <div class="stat-icon tint-warning mb-3"><i class="bi bi-clipboard-check"></i></div>
+                <h3 class="h5 font-heading">3. Recevez vos recommandations</h3>
+                <p class="text-muted small mb-0">Jusqu'a six cultures classees par score de compatibilite, avec conseils culturaux et cycle vegetatif.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="text-center mb-5 reveal">
+        <h2 class="font-heading fw-bold">Pourquoi <span class="gradient-text">AgriA</span></h2>
+        <p class="text-muted">Concue pour le contexte du Nord-Cameroun : sobre en ressources, fiable sur le terrain.</p>
+    </div>
+    <div class="bento-grille">
+        <div class="bento-tuile tuile-large reveal holo-bordure">
+            <i class="bi bi-cpu-fill bento-icone"></i>
+            <h3 class="h4 font-heading mb-1">Un assistant IA 100% local et gratuit</h3>
+            <p class="text-muted small mb-0">Aucune cle API, aucun abonnement : le chatbot et les modeles de classification tournent directement sur le serveur, sans dependance a un service tiers payant.</p>
+        </div>
+        <div class="bento-tuile reveal">
+            <i class="bi bi-shield-lock-fill bento-icone"></i>
+            <h3 class="h5 font-heading mb-1">Donnees hebergees localement</h3>
+            <p class="text-muted small mb-0">Aucune transmission vers un service tiers ; chiffrement, hachage PBKDF2 et journal d'activite complet.</p>
+        </div>
+        <div class="bento-tuile reveal">
+            <i class="bi bi-mortarboard-fill bento-icone"></i>
+            <h3 class="h5 font-heading mb-1">Validation par un expert</h3>
+            <p class="text-muted small mb-0">Toute prediction incertaine est signalee et peut etre corrigee par un expert pedologue.</p>
+        </div>
+        <div class="bento-tuile reveal">
+            <i class="bi bi-camera-fill bento-icone"></i>
+            <h3 class="h5 font-heading mb-1">Classification par photo</h3>
+            <p class="text-muted small mb-0">En plus des parametres saisis, une simple photo du sol permet d'identifier son type reel.</p>
+        </div>
+        <div class="bento-tuile reveal">
+            <i class="bi bi-geo-alt-fill bento-icone"></i>
+            <h3 class="h5 font-heading mb-1">Carte interactive</h3>
+            <p class="text-muted small mb-0">Visualisez toutes vos parcelles analysees, positionnees et coloriees par culture recommandee.</p>
+        </div>
+    </div>
+</section>
+
+<section class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8">
+            <div class="glass-card holo-bordure p-4 p-md-5 reveal">
+                <ul class="nav nav-tabs auth-tabs nav-fill mb-4" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#onglet-connexion" type="button">Connexion</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#onglet-inscription" type="button">Inscription</button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="onglet-connexion">
+                        <form method="post" action="{% url 'comptes:connexion' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Adresse electronique</label>
+                                <input type="email" name="username" class="form-control" required autofocus>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Mot de passe</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="text-end mb-3">
+                                <a href="{% url 'comptes:reinitialisation_mdp' %}" class="small text-muted">Mot de passe oublie ?</a>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 py-2">Se connecter</button>
+                        </form>
+                        {% include "partiels/bouton_google.html" %}
+                    </div>
+                    <div class="tab-pane fade" id="onglet-inscription">
+                        <p class="small text-muted">Creez votre compte agriculteur, agent ou expert. Il sera active par un administrateur.</p>
+                        <a href="{% url 'comptes:inscription' %}" class="btn btn-outline-success w-100 py-2">Continuer vers l'inscription</a>
+                        {% include "partiels/bouton_google.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'vendor/threejs/three.min.js' %}"></script>
+<script src="{% static 'js/hero3d.js' %}"></script>
+{% endblock %}

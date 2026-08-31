@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    {% include "partiels/tete.html" %}
+    <title>{% block titre %}AgriA{% endblock %} — Analyse et classification des sols</title>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="topbar navbar navbar-expand-lg">
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="brand-mark navbar-brand" href="/">
+            <span class="brand-icon"><i class="bi bi-flower1"></i></span>AgriA
+        </a>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <button class="theme-toggle" id="bouton-theme" type="button" aria-label="Changer de theme" title="Changer de theme">
+                <i class="bi bi-moon-stars" id="icone-theme"></i>
+            </button>
+            <a href="{% url 'comptes:connexion' %}" class="btn btn-sm btn-outline-secondary">Connexion</a>
+            <a href="{% url 'comptes:inscription' %}" class="btn btn-sm btn-success">Inscription</a>
+        </div>
+    </div>
+</nav>
+
+<main>
+    {% if messages %}
+    <div class="container mt-4">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'accueil_public' %}
+    <div class="container pt-4">
+        <button type="button" onclick="if (document.referrer.indexOf(window.location.origin) === 0) { history.back(); } else { window.location.href = '/'; }" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour
+        </button>
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+{% include "partiels/scripts.html" %}
+{% block extra_js %}{% endblock %}
+</body>
+</html>

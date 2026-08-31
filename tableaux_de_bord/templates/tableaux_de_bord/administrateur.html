@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block titre %}Tableau de bord — Administrateur{% endblock %}
+{% block content %}
+<div class="mb-4 reveal">
+    <h1 class="h3 font-heading mb-1"><i class="bi bi-shield-lock text-accent"></i> Espace Administrateur</h1>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-6 reveal">
+        <div class="stat-tile">
+            <div class="stat-icon tint-brand"><i class="bi bi-people"></i></div>
+            <div class="stat-value">{{ nb_utilisateurs }}</div>
+            <div class="stat-label">Utilisateurs</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 reveal">
+        <div class="stat-tile">
+            <div class="stat-icon tint-warning"><i class="bi bi-person-dash"></i></div>
+            <div class="stat-value">{{ nb_comptes_inactifs }}</div>
+            <div class="stat-label">Comptes inactifs</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 reveal">
+        <div class="stat-tile">
+            <div class="stat-icon tint-accent"><i class="bi bi-cpu"></i></div>
+            <div class="stat-value">{{ nb_analyses }}</div>
+            <div class="stat-label">Analyses realisees</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 reveal">
+        <div class="stat-tile">
+            <div class="stat-icon tint-brand"><i class="bi bi-flower2"></i></div>
+            <div class="stat-value">{{ nb_cultures }}</div>
+            <div class="stat-label">Cultures au referentiel</div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2 mb-4 flex-wrap reveal">
+    <a href="{% url 'comptes:gestion_utilisateurs' %}" class="btn btn-success"><i class="bi bi-people"></i> Gerer les utilisateurs</a>
+    <a href="{% url 'referentiel:cultures' %}" class="btn btn-outline-success"><i class="bi bi-flower2"></i> Gerer les cultures</a>
+    <a href="{% url 'intelligence:historique_versions' %}" class="btn btn-outline-success"><i class="bi bi-diagram-3"></i> Versions du modele</a>
+    <a href="/admin/" class="btn btn-outline-secondary"><i class="bi bi-gear"></i> Administration Django</a>
+</div>
+
+<div class="card p-4 reveal" style="max-width: 420px;">
+    <div class="card-header px-0 pt-0 border-0"><i class="bi bi-pie-chart"></i> Repartition des comptes par role</div>
+    <ul class="list-group list-group-flush">
+        {% for r in repartition_roles %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ r.role|capfirst }}</span><span class="badge bg-success rounded-pill">{{ r.total }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

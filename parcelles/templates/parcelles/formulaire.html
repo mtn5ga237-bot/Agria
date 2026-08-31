@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static utilitaires l10n %}
+{% block titre %}Nouvelle parcelle{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+    <h1 class="h3 mb-4">Nouvelle parcelle</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" id="formulaire-parcelle">
+                {% csrf_token %}
+                {% if form.proprietaire %}
+                <div class="mb-3">
+                    <label class="form-label">{{ form.proprietaire.label }}</label>
+                    {{ form.proprietaire|add_class:"form-select" }}
+                    <div class="form-text">Selectionnez un producteur pour creer cette parcelle en son nom.</div>
+                    {% for e in form.proprietaire.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                </div>
+                {% endif %}
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nom de la parcelle</label>
+                        {{ form.nom|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Superficie (ha)</label>
+                        {{ form.superficie_ha|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Localite</label>
+                        {{ form.localite|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <label class="form-label">Coordonnees de la parcelle</label>
+                <p class="small text-muted">Cliquez sur la carte pour positionner la parcelle, ou utilisez la geolocalisation.</p>
+                <button type="button" id="bouton-geoloc" class="btn btn-sm btn-outline-secondary mb-2"><i class="bi bi-geo-alt"></i> Me geolocaliser</button>
+                <div id="mini-carte" class="carte-conteneur-mini mb-3"></div>
+                {{ form.latitude }}
+                {{ form.longitude }}
+                <p class="small">Latitude : <span id="affiche-lat">—</span> · Longitude : <span id="affiche-lng">—</span></p>
+                {% for e in form.non_field_errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+
+                <button type="submit" class="btn btn-success">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+    const centreDefaut = [{{ centre.lat|default:"9.3017"|unlocalize }}, {{ centre.lng|default:"13.3921"|unlocalize }}];
+    const champLat = document.getElementById('id_latitude');
+    const champLng = document.getElementById('id_longitude');
+    const carte = L.map('mini-carte').setView(centreDefaut, 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 18,
+    }).addTo(carte);
+
+    let marqueur = null;
+    function positionner(lat, lng) {
+        champLat.value = lat.toFixed(6);
+        champLng.value = lng.toFixed(6);
+        document.getElementById('affiche-lat').textContent = lat.toFixed(4);
+        document.getElementById('affiche-lng').textContent = lng.toFixed(4);
+        if (marqueur) { marqueur.setLatLng([lat, lng]); } else { marqueur = L.marker([lat, lng]).addTo(carte); }
+    }
+
+    carte.on('click', (e) => positionner(e.latlng.lat, e.latlng.lng));
+
+    {% if point_initial %}
+    positionner(centreDefaut[0], centreDefaut[1]);
+    {% endif %}
+
+    document.getElementById('bouton-geoloc').addEventListener('click', () => {
+        if (!navigator.geolocation) { alert('Geolocalisation non supportee par ce navigateur.'); return; }
+        navigator.geolocation.getCurrentPosition(
+            (pos) => { positionner(pos.coords.latitude, pos.coords.longitude); carte.setView([pos.coords.latitude, pos.coords.longitude], 15); },
+            () => alert('Impossible de recuperer votre position.'),
+        );
+    });
+</script>
+{% endblock %}

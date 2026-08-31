@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block titre %}Gestion des utilisateurs{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4"><i class="bi bi-people text-success"></i> Gestion des utilisateurs</h1>
+
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-auto">
+            <input type="text" name="q" class="form-control" placeholder="Rechercher..." value="{{ request.GET.q }}">
+        </div>
+        <div class="col-auto">
+            <select name="role" class="form-select">
+                <option value="">Tous les roles</option>
+                <option value="agriculteur" {% if request.GET.role == 'agriculteur' %}selected{% endif %}>Agriculteur</option>
+                <option value="agent" {% if request.GET.role == 'agent' %}selected{% endif %}>Agent Vulgarisateur</option>
+                <option value="expert" {% if request.GET.role == 'expert' %}selected{% endif %}>Expert Pedologue</option>
+                <option value="admin" {% if request.GET.role == 'admin' %}selected{% endif %}>Administrateur</option>
+            </select>
+        </div>
+        <div class="col-auto"><button class="btn btn-outline-success">Filtrer</button></div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle bg-white">
+            <thead><tr>
+                <th>Nom</th><th>Email</th><th>Role</th><th>Statut</th><th>Inscription</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+            {% for u in utilisateurs %}
+                <tr>
+                    <td>{{ u.nom_complet }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.get_role_display }}</td>
+                    <td>
+                        <span class="badge bg-{% if u.statut == 'actif' %}success{% elif u.statut == 'banni' %}danger{% else %}secondary{% endif %}">
+                            {{ u.statut|capfirst }}
+                        </span>
+                    </td>
+                    <td>{{ u.date_inscription|date:"d/m/Y" }}</td>
+                    <td class="d-flex gap-1">
+                        <form method="post" action="{% url 'comptes:changer_statut' u.pk %}">
+                            {% csrf_token %}
+                            {% if u.statut != 'actif' %}
+                            <button name="action" value="activer" class="btn btn-sm btn-success">Activer</button>
+                            {% endif %}
+                            {% if u.statut == 'actif' %}
+                            <button name="action" value="desactiver" class="btn btn-sm btn-secondary">Desactiver</button>
+                            {% endif %}
+                            {% if u.statut != 'banni' %}
+                            <button name="action" value="bannir" class="btn btn-sm btn-danger">Bannir</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-center text-muted">Aucun utilisateur trouve.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partiels/pagination.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block titre %}Tableau de bord — Agent{% endblock %}
+{% block content %}
+<div class="mb-4 reveal">
+    <h1 class="h3 font-heading mb-1">Bonjour, {{ user.nom_complet }} <i class="bi bi-hand-thumbs-up text-warning"></i></h1>
+    <p class="text-muted">Espace Agent Vulgarisateur</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 reveal">
+        <div class="stat-tile">
+            <div class="stat-icon tint-brand"><i class="bi bi-people"></i></div>
+            <div class="stat-value">{{ nb_producteurs }}</div>
+            <div class="stat-label">Producteurs suivis</div>
+        </div>
+    </div>
+    <div class="col-md-6 reveal">
+        <div class="stat-tile">
+            <div class="stat-icon tint-accent"><i class="bi bi-cpu"></i></div>
+            <div class="stat-value">{{ nb_analyses }}</div>
+            <div class="stat-label">Analyses realisees pour vos producteurs</div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2 mb-4 flex-wrap reveal">
+    <a href="{% url 'analyses:nouvelle' %}" class="btn btn-success"><i class="bi bi-cpu"></i> Realiser une analyse</a>
+    <a href="{% url 'comptes:mes_producteurs' %}" class="btn btn-outline-success"><i class="bi bi-people"></i> Mes producteurs</a>
+</div>
+
+<div class="card card-statique p-0 reveal">
+    <div class="card-header"><i class="bi bi-clock-history"></i> Analyses recentes</div>
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead><tr><th>Date</th><th>Parcelle</th><th>Culture recommandee</th><th></th></tr></thead>
+            <tbody>
+            {% for a in analyses_recentes %}
+                <tr>
+                    <td>{{ a.date_analyse|date:"d/m/Y H:i" }}</td>
+                    <td>{{ a.parcelle.nom }}</td>
+                    <td>{{ a.culture_predite.nom|default:"—" }}</td>
+                    <td><a href="{% url 'analyses:resultat' a.pk %}" class="btn btn-sm btn-outline-success">Voir</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">Aucune analyse pour le moment.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

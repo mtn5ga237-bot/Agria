@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load utilitaires %}
+{% block titre %}Mes producteurs{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 reveal">
+    <h1 class="h3 mb-0"><i class="bi bi-people text-success"></i> Mes producteurs</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'comptes:exporter_producteurs' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-download"></i> Rapport de synthese (CSV)</a>
+        <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modal-rattacher"><i class="bi bi-link-45deg"></i> Rattacher un compte</button>
+        <a href="{% url 'comptes:creer_producteur' %}" class="btn btn-success btn-sm"><i class="bi bi-person-plus"></i> Nouveau producteur</a>
+    </div>
+</div>
+
+{% if zones %}
+<div class="card p-4 mb-4 reveal">
+    <div class="card-header px-0 pt-0 border-0"><i class="bi bi-pie-chart"></i> Repartition par localite</div>
+    <div class="d-flex flex-wrap gap-2">
+        {% for z in zones %}
+        <span class="feature-pill"><i class="bi bi-geo-alt"></i> {{ z.parcelles__localite }} — {{ z.total }} parcelle{{ z.total|pluralize }}</span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="card p-0 reveal">
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead><tr><th>Producteur</th><th>Contact</th><th>Parcelles</th><th>Analyses</th><th>Derniere analyse</th><th></th></tr></thead>
+            <tbody>
+            {% for p in producteurs %}
+                <tr>
+                    <td>{{ p.nom_complet }}</td>
+                    <td>{{ p.email }}{% if p.telephone %}<br><span class="text-faint small">{{ p.telephone }}</span>{% endif %}</td>
+                    <td>{{ p.nb_parcelles }}</td>
+                    <td>{{ p.nb_analyses }}</td>
+                    <td>{{ p.derniere_analyse|date:"d/m/Y"|default:"—" }}</td>
+                    <td><a href="{% url 'comptes:detail_producteur' p.pk %}" class="btn btn-sm btn-outline-success">Voir</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">Aucun producteur suivi pour le moment.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-rattacher" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'comptes:rattacher_producteur' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Rattacher un compte existant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Le producteur doit deja disposer d'un compte Agriculteur non rattache a un autre agent.</p>
+                    <label class="form-label">{{ form_rattacher.email.label }}</label>
+                    {{ form_rattacher.email|add_class:"form-control" }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Rattacher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

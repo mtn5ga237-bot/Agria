@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block titre %}Versions du modele{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0"><i class="bi bi-diagram-3 text-accent"></i> Versions du modele de classification</h1>
+        <a href="{% url 'intelligence:reentrainer' %}" class="btn btn-success"><i class="bi bi-arrow-repeat"></i> Reentrainer le modele</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped bg-white align-middle">
+            <thead><tr><th>Version</th><th>Exactitude</th><th>Precision</th><th>Rappel</th><th>F1</th><th>Observations</th><th>Date</th><th>Statut</th></tr></thead>
+            <tbody>
+            {% for v in versions %}
+                <tr class="{% if v.est_active %}table-success{% endif %}">
+                    <td>v{{ v.numero_version }}</td>
+                    <td>{{ v.exactitude|floatformat:4 }}</td>
+                    <td>{{ v.precision_moy|floatformat:4 }}</td>
+                    <td>{{ v.rappel_moy|floatformat:4 }}</td>
+                    <td>{{ v.score_f1|floatformat:4 }}</td>
+                    <td>{{ v.nb_observations_entrainement }}</td>
+                    <td>{{ v.date_entrainement|date:"d/m/Y H:i" }}</td>
+                    <td>{% if v.est_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Archivee</span>{% endif %}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="8" class="text-center text-muted">Aucun modele entraine. Executez `python manage.py entrainer_modele`.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

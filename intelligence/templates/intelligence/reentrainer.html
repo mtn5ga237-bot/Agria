@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titre %}Reentrainer le modele{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 640px;">
+    <h1 class="h3 mb-3"><i class="bi bi-arrow-repeat text-success"></i> Reentrainement du modele</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p>
+                Cette operation fusionne les analyses validees par les experts pedologues au jeu de donnees
+                d'origine, entraine un nouveau modele, l'evalue puis ne l'active en production que si son
+                exactitude est superieure a celle du modele courant (Figure 10 du rapport de stage).
+            </p>
+            {% with derniere=versions.first %}
+            {% if derniere %}
+                <p class="small text-muted">Modele actuellement actif : v{{ derniere.numero_version }}, exactitude {{ derniere.exactitude|floatformat:4 }}.</p>
+            {% endif %}
+            {% endwith %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Lancer le reentrainement</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

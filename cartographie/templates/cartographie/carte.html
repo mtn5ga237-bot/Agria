@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static l10n %}
+{% block titre %}Carte interactive{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-3"><i class="bi bi-geo-alt text-success"></i> Carte des parcelles analysees</h1>
+    <p class="text-muted">Cliquez sur un marqueur pour consulter le detail de l'analyse, ou sur une zone vierge pour y positionner une nouvelle parcelle. La couleur correspond a la culture recommandee.</p>
+    <div id="carte" class="carte-conteneur"></div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+<script>
+    const carte = L.map('carte').setView([{{ centre.lat|unlocalize }}, {{ centre.lng|unlocalize }}], 9);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(carte);
+
+    fetch("{% url 'cartographie:marqueurs_json' %}")
+        .then((r) => r.json())
+        .then((donnees) => {
+            donnees.marqueurs.forEach((m) => {
+                const marqueur = L.circleMarker([m.lat, m.lng], {
+                    radius: 9, color: m.couleur, fillColor: m.couleur, fillOpacity: .85, weight: 2,
+                }).addTo(carte);
+                const ligneSol = m.type_sol ? `Type de sol (photo) : ${m.type_sol}<br>` : '';
+                marqueur.bindPopup(
+                    `<strong>${m.parcelle}</strong><br>Culture recommandee : ${m.culture}<br>` +
+                    ligneSol +
+                    `Confiance : ${m.confiance ?? '—'}%<br>Date : ${m.date}<br>` +
+                    `Autres cultures : ${m.cultures.join(', ') || '—'}<br>` +
+                    `<a href="/analyses/${m.id}/resultat/">Voir le detail</a>`
+                );
+            });
+        });
+
+    carte.on('click', (e) => {
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+        L.popup()
+            .setLatLng(e.latlng)
+            .setContent(
+                `Latitude : ${lat}<br>Longitude : ${lng}<br>` +
+                `<a href="/parcelles/nouvelle/?lat=${lat}&lng=${lng}" class="btn btn-sm btn-success mt-2">` +
+                `<i class="bi bi-plus-lg"></i> Creer une parcelle ici</a>`
+            )
+            .openOn(carte);
+    });
+</script>
+{% endblock %}

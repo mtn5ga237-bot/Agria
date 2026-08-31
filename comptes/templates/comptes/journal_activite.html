@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block titre %}Journal d'activite{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4"><i class="bi bi-shield-lock text-success"></i> Journal d'activite et de securite</h1>
+    <p class="text-muted small mb-4">Trace horodatee des connexions, des operations d'administration et des actions
+        sensibles realisees sur la plateforme (Tableau 17).</p>
+
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-auto">
+            <input type="text" name="q" class="form-control" placeholder="Rechercher (action, email, IP)..." value="{{ request.GET.q }}">
+        </div>
+        <div class="col-auto"><button class="btn btn-outline-success">Filtrer</button></div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle bg-white">
+            <thead><tr>
+                <th>Date et heure</th><th>Utilisateur</th><th>Action</th><th>Adresse IP</th><th>Details</th>
+            </tr></thead>
+            <tbody>
+            {% for e in entrees %}
+                <tr>
+                    <td class="text-nowrap">{{ e.horodatage|date:"d/m/Y H:i:s" }}</td>
+                    <td>{% if e.utilisateur %}{{ e.utilisateur.email }}{% else %}<span class="text-muted">anonyme</span>{% endif %}</td>
+                    <td>{{ e.action }}</td>
+                    <td>{{ e.adresse_ip|default:"—" }}</td>
+                    <td class="text-muted small">{{ e.details|default:"—" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-center text-muted">Aucune entree dans le journal.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "partiels/pagination.html" %}
+</div>
+{% endblock %}

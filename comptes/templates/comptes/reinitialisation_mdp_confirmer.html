@@ -1,0 +1,39 @@
+{% extends "base_public.html" %}
+{% load utilitaires %}
+{% block titre %}Nouveau mot de passe{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="glass-card p-4 p-md-5 reveal">
+                {% if validlink %}
+                    <div class="text-center mb-4">
+                        <span class="brand-icon d-inline-flex mb-3" style="width:52px;height:52px;font-size:1.6rem;"><i class="bi bi-shield-lock"></i></span>
+                        <h1 class="h3 font-heading mb-1">Choisir un nouveau mot de passe</h1>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for champ in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ champ.label }}</label>
+                            {{ champ|add_class:"form-control" }}
+                            {% for e in champ.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                            {% if champ.help_text %}<div class="form-text">{{ champ.help_text|safe }}</div>{% endif %}
+                        </div>
+                        {% endfor %}
+                        {% for e in form.non_field_errors %}<div class="text-danger small mb-2">{{ e }}</div>{% endfor %}
+                        <button type="submit" class="btn btn-success w-100 py-2">Valider le nouveau mot de passe</button>
+                    </form>
+                {% else %}
+                    <div class="text-center">
+                        <div class="display-4 mb-3"><i class="bi bi-exclamation-triangle text-warning"></i></div>
+                        <h1 class="h4 font-heading mb-2">Lien invalide ou expire</h1>
+                        <p class="text-muted">Ce lien de reinitialisation n'est plus valable (il expire au bout de 2 heures et n'est utilisable qu'une seule fois).</p>
+                        <a href="{% url 'comptes:reinitialisation_mdp' %}" class="btn btn-success mt-2">Demander un nouveau lien</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

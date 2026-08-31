@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load static l10n %}
+{% block titre %}Resultat de l'analyse{% endblock %}
+{% block content %}
+<div class="container-fluid" style="max-width: 960px;">
+
+    {% if analyse.statut == 'terminee' %}
+    <div class="glass-card mb-4 reveal" style="border-color: rgba(34,197,94,.35);">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-4">
+                <div>
+                    <p class="text-muted mb-1"><i class="bi bi-cpu"></i> Culture recommandee par l'IA</p>
+                    <h1 class="display-5 font-heading gradient-text mb-0">{{ analyse.culture_predite.nom }}</h1>
+                    <p class="text-faint small mt-2 mb-0">Analyse #{{ analyse.pk }} · {{ analyse.date_analyse|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div class="jauge-confiance" id="jauge-confiance" data-confiance="{{ analyse.confiance_culture|unlocalize }}">
+                    <svg viewBox="0 0 132 132">
+                        <defs>
+                            <linearGradient id="degrade-jauge" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="{% if analyse.confiance_culture >= 70 %}#22c55e{% else %}#f59e0b{% endif %}"/>
+                                <stop offset="1" stop-color="{% if analyse.confiance_culture >= 70 %}#38bdf8{% else %}#ef4444{% endif %}"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="piste" cx="66" cy="66" r="56"></circle>
+                        <circle class="valeur" id="cercle-jauge" cx="66" cy="66" r="56" stroke-dasharray="351.86" stroke-dashoffset="351.86"></circle>
+                    </svg>
+                    <div class="centre">
+                        <span class="chiffre">{{ analyse.confiance_culture|floatformat:0 }}%</span>
+                        <span class="etiquette">Confiance</span>
+                    </div>
+                </div>
+            </div>
+            {% if not analyse.validee %}
+            <div class="alert alert-warning mt-3 mb-0">
+                <i class="bi bi-exclamation-triangle"></i> Indice de confiance inferieur au seuil de 70 % : cette analyse est signalee pour validation par un expert pedologue.
+            </div>
+            {% endif %}
+
+            {% if est_expert or est_administrateur %}
+            <div class="mt-3 pt-3" style="border-top: 1px solid var(--border);">
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    {% if analyse.validee %}
+                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Validee</span>
+                    {% else %}
+                        <span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> En attente de validation</span>
+                    {% endif %}
+                    <span class="text-muted small"><i class="bi bi-mortarboard"></i> Espace Expert Pedologue — confirmez ou corrigez la prediction ci-dessous</span>
+                </div>
+                <form method="post" action="{% url 'analyses:valider' analyse.pk %}" class="row g-2 align-items-end">
+                    {% csrf_token %}
+                    <div class="col-sm-5">
+                        <label class="form-label small mb-1">Culture recommandee</label>
+                        <select name="culture" class="form-select form-select-sm">
+                            {% for c in cultures %}
+                            <option value="{{ c.code }}" {% if c.pk == analyse.culture_predite_id %}selected{% endif %}>{{ c.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-5">
+                        <label class="form-label small mb-1">Type de sol (si connu)</label>
+                        <select name="type_sol" class="form-select form-select-sm">
+                            <option value="">— Non identifie —</option>
+                            {% for t in types_sols %}
+                            <option value="{{ t.code }}" {% if analyse.type_sol_id == t.pk %}selected{% endif %}>{{ t.libelle }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-2">
+                        <button class="btn btn-success btn-sm w-100"><i class="bi bi-check-lg"></i> Valider</button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if analyse.type_sol %}
+    <div class="card mb-4 reveal">
+        <div class="card-body d-flex flex-wrap align-items-center gap-4">
+            {% if analyse.photo_sol %}
+            <img src="{{ analyse.photo_sol.url }}" alt="Photo du sol" class="rounded" style="width:96px; height:96px; object-fit:cover; border:1px solid var(--border);">
+            {% endif %}
+            <div>
+                {% if analyse.photo_sol %}
+                <p class="text-muted mb-1"><i class="bi bi-camera"></i> Type de sol identifie par photo</p>
+                {% else %}
+                <p class="text-muted mb-1"><i class="bi bi-mortarboard"></i> Type de sol confirme par l'expert</p>
+                {% endif %}
+                <h2 class="h4 font-heading mb-0" style="color: {{ analyse.type_sol.couleur_hex }};">{{ analyse.type_sol.libelle }}</h2>
+                {% if analyse.confiance_sol is not None %}
+                <p class="text-faint small mb-0">Confiance : {{ analyse.confiance_sol|floatformat:0 }}%</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header">Importance des parametres dans la decision</div>
+                <div class="card-body"><canvas id="graphique-importance"></canvas></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header">Parametres saisis</div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr><td>pH</td><td>{{ analyse.ph }}</td></tr>
+                        <tr><td>Azote (N)</td><td>{{ analyse.azote }} mg/kg</td></tr>
+                        <tr><td>Phosphore (P)</td><td>{{ analyse.phosphore }} mg/kg</td></tr>
+                        <tr><td>Potassium (K)</td><td>{{ analyse.potassium }} mg/kg</td></tr>
+                        <tr><td>Temperature</td><td>{{ analyse.temperature }} °C</td></tr>
+                        <tr><td>Humidite</td><td>{{ analyse.humidite }} %</td></tr>
+                        <tr><td>Pluviometrie</td><td>{{ analyse.pluviometrie }} mm</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="h4 mb-3"><i class="bi bi-flower2 text-success"></i> Cultures recommandees</h2>
+    <div class="row g-3">
+        {% for reco in analyse.recommandations.all %}
+        <div class="col-md-4 reveal">
+            <div class="card carte-culture h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h3 class="h5 mb-0">{% if forloop.first %}<i class="bi bi-trophy-fill text-warning"></i> {% endif %}{{ reco.culture.nom }}</h3>
+                        <span class="badge badge-score bg-success">{{ reco.score }}/100</span>
+                    </div>
+                    <p class="small text-muted fst-italic">{{ reco.culture.nom_scientifique }}</p>
+                    <p class="small">Cycle vegetatif : {{ reco.culture.cycle_jours }} jours</p>
+                    <p class="small">{{ reco.culture.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12"><div class="alert alert-secondary">Aucune culture n'atteint le seuil de compatibilite pour ce sol.</div></div>
+        {% endfor %}
+    </div>
+
+    {% elif analyse.statut == 'erreur' %}
+        <div class="alert alert-danger">Cette analyse a echoue. Veuillez en relancer une nouvelle.</div>
+    {% else %}
+        <div class="alert alert-info">Analyse en cours de traitement...</div>
+    {% endif %}
+
+    <a href="{% url 'analyses:nouvelle' %}" class="btn btn-outline-success mt-4"><i class="bi bi-cpu"></i> Nouvelle analyse</a>
+    <a href="{% url 'analyses:historique' %}" class="btn btn-outline-secondary mt-4"><i class="bi bi-clock-history"></i> Voir l'historique</a>
+</div>
+{% endblock %}
+{% block extra_js %}
+{% if analyse.importances_variables %}{{ analyse.importances_variables|json_script:"donnees-importance" }}{% endif %}
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script>
+(function () {
+    const jauge = document.getElementById('jauge-confiance');
+    if (jauge) {
+        const cercle = document.getElementById('cercle-jauge');
+        const confiance = parseFloat(jauge.dataset.confiance);
+        const circonference = 351.86;
+        const cible = circonference * (1 - Math.min(Math.max(confiance, 0), 100) / 100);
+        requestAnimationFrame(() => { cercle.style.strokeDashoffset = cible; });
+    }
+})();
+
+{% if analyse.importances_variables %}
+const importances = JSON.parse(document.getElementById('donnees-importance').textContent);
+const etiquettes = Object.keys(importances);
+const valeurs = Object.values(importances);
+const couleurTexte = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
+const couleurGrille = getComputedStyle(document.documentElement).getPropertyValue('--border').trim();
+new Chart(document.getElementById('graphique-importance'), {
+    type: 'bar',
+    data: {
+        labels: etiquettes,
+        datasets: [{
+            label: 'Importance', data: valeurs,
+            backgroundColor: '#22c55e', borderRadius: 6, barThickness: 14,
+        }],
+    },
+    options: {
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { color: couleurTexte }, grid: { color: couleurGrille } },
+            y: { ticks: { color: couleurTexte }, grid: { display: false } },
+        },
+    },
+});
+{% endif %}
+</script>
+{% endblock %}

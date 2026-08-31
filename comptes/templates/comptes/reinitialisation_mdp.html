@@ -1,0 +1,33 @@
+{% extends "base_public.html" %}
+{% load utilitaires %}
+{% block titre %}Mot de passe oublie{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="glass-card p-4 p-md-5 reveal">
+                <div class="text-center mb-4">
+                    <span class="brand-icon d-inline-flex mb-3" style="width:52px;height:52px;font-size:1.6rem;"><i class="bi bi-key"></i></span>
+                    <h1 class="h3 font-heading mb-1">Mot de passe oublie</h1>
+                    <p class="text-muted small mb-0">
+                        Saisissez votre adresse electronique. Si un compte actif y est associe, un lien de
+                        reinitialisation valable 2 heures vous sera envoye.
+                    </p>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.email.label }}</label>
+                        {{ form.email|add_class:"form-control" }}
+                        {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 py-2"><i class="bi bi-send"></i> Envoyer le lien</button>
+                </form>
+                <p class="mt-4 mb-0 text-center small text-muted">
+                    <a href="{% url 'comptes:connexion' %}">← Retour a la connexion</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
