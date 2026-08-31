@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: agria
+    runtime: python
+    plan: free
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate &&
+      python manage.py loaddata referentiel/fixtures/types_sols.json &&
+      python manage.py loaddata referentiel/fixtures/cultures.json &&
+      python manage.py creer_comptes_demo
+    startCommand: gunicorn config.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: PYTHON_VERSION
+        value: "3.11.9"
