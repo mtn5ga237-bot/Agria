@@ -19,24 +19,49 @@ class FormulaireInscription(forms.ModelForm):
     mot_de_passe = forms.CharField(label='Mot de passe', widget=forms.PasswordInput, strip=False)
     confirmation = forms.CharField(label='Confirmer le mot de passe', widget=forms.PasswordInput, strip=False)
 
+    # Textes affiches sous le champ "localite" selon le role choisi (bascule en JavaScript,
+    # voir comptes/templates/comptes/inscription.html) ; exposes ici pour n'avoir qu'un seul
+    # endroit a modifier si le libelle change.
+    AIDE_LOCALITE = {
+        Utilisateur.Role.AGRICULTEUR: "Votre village ou votre ville, pour qu'on vous propose un "
+                                       'agent vulgarisateur proche.',
+        Utilisateur.Role.AGENT: 'Votre zone d\'intervention.',
+        Utilisateur.Role.EXPERT: 'La region dont vous assurerez le suivi : les analyses non '
+                                  'validees de cette region vous seront proposees en priorite.',
+    }
+
     class Meta:
         model = Utilisateur
-        fields = ['nom_complet', 'email', 'telephone', 'role', 'localite']
+        fields = ['nom_complet', 'email', 'telephone', 'role', 'localite', 'document_justificatif']
         widgets = {
             'nom_complet': forms.TextInput(attrs={'autofocus': True}),
             'localite': forms.TextInput(attrs={'placeholder': 'Ex. Pitoa, Ngong, Lagdo...'}),
         }
-        labels = {'localite': 'Localite (facultatif)'}
-        help_texts = {
-            'localite': "Agriculteur : votre village ou votre ville, pour qu'on vous propose un agent "
-                        'vulgarisateur proche. Agent vulgarisateur : votre zone d\'intervention.',
+        labels = {
+            'localite': 'Localite',
+            'document_justificatif': 'Document justificatif (agent ou expert)',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['document_justificatif'].required = False
+        self.fields['document_justificatif'].help_text = (
+            "Reserve aux agents vulgarisateurs et aux experts pedologues : carte professionnelle, "
+            "attestation ou tout document officiel prouvant votre role. Seul l'administrateur peut "
+            'le consulter ; il sert a verifier votre profil avant d\'activer le compte.'
+        )
 
     def clean_email(self):
         email = self.cleaned_data['email'].lower().strip()
         if Utilisateur.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError('Cette adresse electronique est deja utilisee.')
         return email
+
+    def clean_document_justificatif(self):
+        document = self.cleaned_data.get('document_justificatif')
+        if document and hasattr(document, 'size') and document.size > 5 * 1024 * 1024:
+            raise forms.ValidationError('Le document ne doit pas depasser 5 Mo.')
+        return document
 
     def clean(self):
         cleaned = super().clean()
@@ -46,6 +71,14 @@ class FormulaireInscription(forms.ModelForm):
             raise forms.ValidationError('Les deux mots de passe ne correspondent pas.')
         if mot_de_passe:
             password_validation.validate_password(mot_de_passe)
+
+        role = cleaned.get('role')
+        if role in (Utilisateur.Role.AGENT, Utilisateur.Role.EXPERT) and not cleaned.get('document_justificatif'):
+            self.add_error(
+                'document_justificatif',
+                "Un document justificatif est requis pour s'inscrire en tant qu'agent vulgarisateur "
+                'ou expert pedologue.',
+            )
         return cleaned
 
     def save(self, commit=True):

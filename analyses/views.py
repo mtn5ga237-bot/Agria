@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView, ListView, View
 
 from comptes.middleware import adresse_ip_client
+from comptes.mixins import ExpertRequisMixin
 from comptes.models import JournalActivite
 from intelligence.ecart import analyser_ecart
 from intelligence.image_predictor import SoilImagePredictor
@@ -120,6 +121,23 @@ class ResultatAnalyseView(LoginRequiredMixin, DetailView):
         if self.request.user.a_le_role('expert', 'admin'):
             contexte['cultures'] = Culture.objects.order_by('nom')
             contexte['types_sols'] = TypeSol.objects.order_by('libelle')
+
+        # Pour chaque culture recommandee dont le score n'est pas deja parfait, un apercu rapide
+        # des engrais permettant de s'en rapprocher (reutilise le module d'analyse d'ecart) :
+        # repond au besoin de l'agriculteur qui veut une culture precise mais dont le sol ne la
+        # couvre pas entierement. Calcul uniquement en memoire (pas de requete BD supplementaire
+        # tant qu'aucun type de sol n'est renseigne), pour rester rapide meme sur un hebergement
+        # au CPU limite.
+        if self.object.statut == Analyse.Statut.TERMINEE:
+            parametres = self.object.parametres()
+            ameliorations = {}
+            for reco in self.object.recommandations.all():
+                if reco.score >= 100:
+                    continue
+                resultat = analyser_ecart(reco.culture, parametres, self.object.type_sol)
+                if resultat['plan_amendement']:
+                    ameliorations[reco.culture_id] = resultat['plan_amendement'][:2]
+            contexte['ameliorations'] = ameliorations
         return contexte
 
 
@@ -135,6 +153,30 @@ class HistoriqueAnalysesView(LoginRequiredMixin, ListView):
         if self.request.user.a_le_role('expert', 'admin'):
             return qs
         return qs.filter(parcelle__proprietaire=self.request.user)
+
+
+class AnalysesAValiderView(ExpertRequisMixin, ListView):
+    """File d'attente de validation de l'expert pedologue, filtree par region : un expert ne
+    voit que les analyses non validees dont la parcelle se trouve dans sa propre localite
+    (son champ Utilisateur.localite), afin de repartir la charge de validation entre experts
+    regionaux plutot que de melanger toutes les regions dans une seule liste."""
+
+    template_name = 'analyses/a_valider.html'
+    context_object_name = 'analyses'
+
+    def get_queryset(self):
+        self.localite = self.request.user.localite
+        qs = Analyse.objects.select_related('parcelle', 'operateur', 'type_sol', 'culture_predite').filter(
+            statut=Analyse.Statut.TERMINEE, validee=False,
+        ).order_by('-date_analyse')
+        if not self.localite:
+            return qs.none()
+        return qs.filter(parcelle__localite__icontains=self.localite)
+
+    def get_context_data(self, **kwargs):
+        contexte = super().get_context_data(**kwargs)
+        contexte['localite'] = self.localite
+        return contexte
 
 
 class ValiderAnalyseView(LoginRequiredMixin, View):

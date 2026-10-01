@@ -12,7 +12,7 @@
                     <p class="text-muted small mb-0">Rejoignez AgriA en tant que producteur, agent ou expert</p>
                 </div>
 
-                <form method="post" novalidate>
+                <form method="post" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
                     {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
 
@@ -38,7 +38,13 @@
                         <div class="col-12">
                             <label class="form-label">{{ form.localite.label }}</label>
                             {{ form.localite|add_class:"form-control" }}
-                            <div class="form-text">{{ form.localite.help_text }}</div>
+                            <div class="form-text" id="aide-localite"></div>
+                        </div>
+                        <div class="col-12" id="bloc-document">
+                            <label class="form-label">{{ form.document_justificatif.label }}</label>
+                            {{ form.document_justificatif|add_class:"form-control" }}
+                            <div class="form-text">{{ form.document_justificatif.help_text }}</div>
+                            {% for e in form.document_justificatif.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Mot de passe</label>
@@ -65,4 +71,33 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+    const AIDE_LOCALITE = {
+        agriculteur: "Votre village ou votre ville, pour qu'on vous propose un agent vulgarisateur proche.",
+        agent: "Votre zone d'intervention.",
+        expert: "La region dont vous assurerez le suivi : les analyses non validees de cette region vous seront proposees en priorite.",
+    };
+    const selectRole = document.getElementById('id_role');
+    const aideLocalite = document.getElementById('aide-localite');
+    const blocDocument = document.getElementById('bloc-document');
+    const champDocument = document.getElementById('id_document_justificatif');
+
+    function actualiser() {
+        if (!selectRole) return;
+        const role = selectRole.value;
+        if (aideLocalite) aideLocalite.textContent = AIDE_LOCALITE[role] || '';
+        const requiertDocument = role === 'agent' || role === 'expert';
+        if (blocDocument) blocDocument.classList.toggle('d-none', !requiertDocument);
+        if (champDocument) champDocument.required = requiertDocument;
+    }
+
+    if (selectRole) {
+        selectRole.addEventListener('change', actualiser);
+        actualiser();
+    }
+})();
+</script>
 {% endblock %}

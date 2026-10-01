@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Max, Q
-from django.http import HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
@@ -39,7 +39,9 @@ class InscriptionView(CreateView):
         )
         messages.success(
             self.request,
-            "Votre compte a ete cree. Il doit etre active par un administrateur avant la premiere connexion.",
+            "Votre compte a ete cree. Il doit etre active par un administrateur avant la premiere "
+            'connexion. Pour accelerer l\'activation, contactez l\'administrateur a l\'adresse '
+            'admin@gmail.com.',
         )
         return reponse
 
@@ -107,6 +109,27 @@ def changer_mot_de_passe_view(request):
     else:
         form = FormulaireChangementMotDePasse(request.user)
     return render(request, 'comptes/changer_mot_de_passe.html', {'form': form})
+
+
+@login_required
+def document_justificatif_view(request, pk):
+    """Sert le document justificatif d'un agent ou d'un expert : reserve a l'administrateur
+    (le nom de fichier sur disque est deja un UUID non devinable, mais seul ce controle
+    garantit qu'un lien ne peut pas etre partage ou retrouve par un tiers)."""
+    if not request.user.a_le_role('admin'):
+        raise PermissionDenied("Seul l'administrateur peut consulter les documents justificatifs.")
+    cible = get_object_or_404(Utilisateur, pk=pk)
+    if not cible.document_justificatif:
+        raise Http404("Aucun document justificatif pour ce compte.")
+    JournalActivite.objects.create(
+        utilisateur=request.user,
+        action=f'Consultation du document justificatif de {cible.email}',
+        adresse_ip=adresse_ip_client(request),
+    )
+    extension = cible.document_justificatif.name.rsplit('.', 1)[-1] if '.' in cible.document_justificatif.name else 'bin'
+    return FileResponse(
+        cible.document_justificatif.open('rb'), filename=f'document_{cible.pk}.{extension}',
+    )
 
 
 class GestionUtilisateursView(AdministrateurRequisMixin, ListView):

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load utilitaires %}
+{% block titre %}Analyses a valider{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 reveal">
+    <h1 class="h3 mb-0"><i class="bi bi-patch-check text-success"></i> Analyses a valider</h1>
+</div>
+
+<div class="card p-4 mb-4 reveal">
+    <p class="mb-2">
+        Analyses dont l'indice de confiance est inferieur a 70 % (Dossier V, 6.2), signalees pour
+        validation ou correction. Seules celles de votre region vous sont proposees ici.
+    </p>
+    {% if localite %}
+        <p class="mb-0 text-muted small"><i class="bi bi-geo-alt"></i> Region suivie : <strong>{{ localite }}</strong></p>
+    {% endif %}
+</div>
+
+{% if not localite %}
+    {% url 'comptes:profil' as lien_profil %}
+    <div class="row">
+        {% include "partiels/etat_vide.html" with icone="bi-geo" titre="Indiquez votre region" message="Pour recevoir les analyses a valider de votre region, renseignez d'abord votre localite dans votre profil." lien_url=lien_profil lien_texte="Modifier mon profil" %}
+    </div>
+{% elif analyses %}
+    <div class="card p-0 reveal">
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead><tr><th>Date</th><th>Parcelle</th><th>Localite</th><th>Operateur</th><th>Culture predite</th><th>Confiance</th><th></th></tr></thead>
+                <tbody>
+                {% for a in analyses %}
+                    <tr>
+                        <td>{{ a.date_analyse|date:"d/m/Y H:i" }}</td>
+                        <td>{{ a.parcelle.nom }}</td>
+                        <td>{{ a.parcelle.localite|default:"—" }}</td>
+                        <td>{{ a.operateur.nom_complet }}</td>
+                        <td>{{ a.culture_predite.nom|default:"—" }}</td>
+                        <td><span class="badge bg-warning text-dark">{{ a.confiance_culture|floatformat:0 }}%</span></td>
+                        <td><a href="{% url 'analyses:resultat' a.pk %}" class="btn btn-sm btn-outline-success">Examiner</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        {% include "partiels/etat_vide.html" with icone="bi-check-circle" titre="Aucune analyse en attente" message="Aucune analyse de votre region n'est actuellement signalee pour validation." %}
+    </div>
+{% endif %}
+{% endblock %}

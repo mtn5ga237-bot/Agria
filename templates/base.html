@@ -52,6 +52,9 @@
 
                 {% if est_expert or est_administrateur %}
                 <div class="nav-section-label">Expertise</div>
+                {% if est_expert %}
+                <a class="side-link {% actif_si '/analyses/a-valider' %}" href="{% url 'analyses:a_valider' %}"><i class="bi bi-patch-check"></i> Analyses a valider</a>
+                {% endif %}
                 <a class="side-link {% actif_si '/referentiel/sols' %}" href="{% url 'referentiel:types_sols' %}"><i class="bi bi-droplet-half"></i> Referentiel des sols</a>
                 <a class="side-link {% actif_si '/referentiel/cultures' %}" href="{% url 'referentiel:cultures' %}"><i class="bi bi-flower2"></i> Referentiel des cultures</a>
                 <a class="side-link {% actif_si '/intelligence/versions' %}" href="{% url 'intelligence:historique_versions' %}"><i class="bi bi-diagram-3"></i> Versions du modele</a>

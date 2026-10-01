@@ -18,6 +18,15 @@ def actif_si(context, prefixe):
     return 'active' if request.path.startswith(prefixe) else ''
 
 
+@register.filter(name='dictget')
+def dictget(dictionnaire, cle):
+    """Acces a une valeur de dictionnaire par une cle variable (usage : {{ mon_dict|dictget:cle }}),
+    ce que le gabarit Django ne permet pas nativement (seul mon_dict.cle_litterale fonctionne)."""
+    if not dictionnaire:
+        return None
+    return dictionnaire.get(cle)
+
+
 @register.filter(name='add_class')
 def add_class(champ, classes):
     """Ajoute des classes CSS (Bootstrap) a un champ de formulaire Django dans le gabarit."""

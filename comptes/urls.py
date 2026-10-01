@@ -13,6 +13,7 @@ urlpatterns = [
     path('profil/mot-de-passe/', views.changer_mot_de_passe_view, name='changer_mot_de_passe'),
     path('utilisateurs/', views.GestionUtilisateursView.as_view(), name='gestion_utilisateurs'),
     path('utilisateurs/<int:pk>/statut/', views.changer_statut_utilisateur_view, name='changer_statut'),
+    path('utilisateurs/<int:pk>/document/', views.document_justificatif_view, name='document_justificatif'),
     path('journal/', views.JournalActiviteView.as_view(), name='journal_activite'),
 
     # Portefeuille de producteurs de l'agent vulgarisateur

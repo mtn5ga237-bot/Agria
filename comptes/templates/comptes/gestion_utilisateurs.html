@@ -37,8 +37,15 @@
                         </span>
                     </td>
                     <td>{{ u.date_inscription|date:"d/m/Y" }}</td>
-                    <td class="d-flex gap-1">
-                        <form method="post" action="{% url 'comptes:changer_statut' u.pk %}">
+                    <td class="d-flex flex-wrap gap-1">
+                        {% if u.role == 'agent' or u.role == 'expert' %}
+                            {% if u.document_justificatif %}
+                            <a href="{% url 'comptes:document_justificatif' u.pk %}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" title="Voir le document justificatif"><i class="bi bi-file-earmark-text"></i></a>
+                            {% else %}
+                            <span class="btn btn-sm btn-outline-secondary disabled" title="Aucun document televerse"><i class="bi bi-file-earmark-x"></i></span>
+                            {% endif %}
+                        {% endif %}
+                        <form method="post" action="{% url 'comptes:changer_statut' u.pk %}" class="d-flex flex-wrap gap-1">
                             {% csrf_token %}
                             {% if u.statut != 'actif' %}
                             <button name="action" value="activer" class="btn btn-sm btn-success">Activer</button>

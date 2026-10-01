@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static l10n %}
+{% load static l10n utilitaires %}
 {% block titre %}Resultat de l'analyse{% endblock %}
 {% block content %}
 <div class="container-fluid" style="max-width: 960px;">
@@ -133,6 +133,19 @@
                     <p class="small text-muted fst-italic">{{ reco.culture.nom_scientifique }}</p>
                     <p class="small">Cycle vegetatif : {{ reco.culture.cycle_jours }} jours</p>
                     <p class="small">{{ reco.culture.description }}</p>
+                    {% with amelioration=ameliorations|dictget:reco.culture_id %}
+                    {% if amelioration %}
+                    <div class="small border-top pt-2 mt-2" style="border-color: var(--border);">
+                        <span class="text-faint"><i class="bi bi-droplet"></i> Pour ameliorer le score :</span>
+                        <ul class="mb-0 ps-3">
+                            {% for ligne in amelioration %}
+                            <li>{{ ligne.intrant }}{% if ligne.quantite_kg_ha %} — {{ ligne.quantite_kg_ha }} kg/ha{% endif %}</li>
+                            {% endfor %}
+                        </ul>
+                        <a href="{% url 'analyses:ecart' analyse.pk %}?culture={{ reco.culture_id }}" class="small">Voir le plan complet</a>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
                 </div>
             </div>
         </div>

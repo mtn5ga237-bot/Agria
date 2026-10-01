@@ -1,7 +1,17 @@
+import uuid
+
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils import timezone
+
+
+def chemin_document_justificatif(instance, nom_fichier):
+    """Regenere un nom de fichier aleatoire pour le document justificatif televerse par un
+    agent vulgarisateur ou un expert pedologue a l'inscription, afin de ne jamais exposer ni
+    reutiliser le nom fourni par l'utilisateur (meme principe que Analyse.chemin_photo_sol)."""
+    extension = nom_fichier.rsplit('.', 1)[-1].lower() if '.' in nom_fichier else 'pdf'
+    return f'documents_justificatifs/{uuid.uuid4().hex}.{extension}'
 
 
 class GestionnaireUtilisateur(BaseUserManager):
@@ -46,6 +56,15 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     # lieu de residence pour un agriculteur (permet de lui proposer les agents les plus proches
     # avant meme qu'il n'ait enregistre une parcelle). Texte libre, a l'image de Parcelle.localite.
     localite = models.CharField('localite / zone d\'intervention', max_length=100, blank=True)
+
+    # Document officiel (carte professionnelle, attestation...) justifiant le role declare par
+    # un agent vulgarisateur ou un expert pedologue a l'inscription : n'importe qui peut cocher
+    # « agent » ou « expert » dans le formulaire, ce document permet a l'administrateur de le
+    # verifier avant d'activer le compte (Dossier VII, 2.1). Seul l'administrateur peut le
+    # consulter (voir comptes.views.DocumentJustificatifView) ; non requis pour un agriculteur.
+    document_justificatif = models.FileField(
+        'document justificatif', upload_to=chemin_document_justificatif, null=True, blank=True,
+    )
 
     # Le champ agent_vulgarisateur permet a un agent de suivre les producteurs de son secteur.
     agent_vulgarisateur = models.ForeignKey(
