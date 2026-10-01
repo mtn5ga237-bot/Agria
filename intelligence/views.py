@@ -1,4 +1,3 @@
-import pandas as pd
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -25,6 +24,11 @@ class ReentrainerModeleView(ExpertRequisMixin, ListView):
     context_object_name = 'versions'
 
     def post(self, request, *args, **kwargs):
+        # Import differe : pandas n'est utilise que par le reentrainement (reserve a
+        # l'expert), pas par le reste de l'application - inutile de l'exiger au demarrage
+        # du serveur sur un hebergement au stockage limite.
+        import pandas as pd
+
         from analyses.models import Analyse
 
         analyses_validees = Analyse.objects.filter(validee=True, culture_predite__isnull=False)
