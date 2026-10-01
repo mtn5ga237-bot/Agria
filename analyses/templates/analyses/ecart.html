@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load utilitaires %}
+{% block titre %}Analyse d'ecart{% endblock %}
+{% block content %}
+<div class="container-fluid" style="max-width: 960px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 reveal">
+        <h1 class="h3 mb-0"><i class="bi bi-arrow-left-right text-success"></i> Analyse d'ecart</h1>
+        <a href="{% url 'analyses:resultat' analyse.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Retour au resultat</a>
+    </div>
+
+    <div class="card p-4 mb-4 reveal">
+        <p class="mb-3">
+            AgriA recommande <strong>{{ analyse.culture_predite.nom }}</strong> pour ce sol (analyse
+            #{{ analyse.pk }}, {{ analyse.parcelle.nom }}). Si vous souhaitez plutot cultiver une
+            culture precise — pour un contrat d'achat, une tradition familiale, etc. — choisissez-la
+            ci-dessous : nous comparons vos parametres a ses exigences et, si besoin, proposons un
+            plan d'amendement.
+        </p>
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-sm-8 col-md-6">
+                <label class="form-label small mb-1">Culture cible</label>
+                <select name="culture" class="form-select">
+                    <option value="">— Choisir une culture —</option>
+                    {% for c in cultures %}
+                    <option value="{{ c.pk }}" {% if culture_cible.pk == c.pk %}selected{% endif %}>{{ c.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-4 col-md-3">
+                <button type="submit" class="btn btn-success w-100"><i class="bi bi-search"></i> Comparer</button>
+            </div>
+        </form>
+    </div>
+
+    {% if culture_cible and resultat %}
+    <div class="card p-4 mb-4 reveal {% if resultat.faisabilite == 'immediate' %}border-success{% elif resultat.faisabilite == 'avec_amendements' %}border-warning{% else %}border-danger{% endif %}" style="border-width:1px; border-style:solid;">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-2">
+            <h2 class="h5 mb-0">{{ culture_cible.nom }}</h2>
+            {% if resultat.faisabilite == 'immediate' %}
+                <span class="badge bg-success fs-6"><i class="bi bi-check-circle"></i> Immediatement faisable</span>
+            {% elif resultat.faisabilite == 'avec_amendements' %}
+                <span class="badge bg-warning text-dark fs-6"><i class="bi bi-tools"></i> Faisable avec amendements</span>
+            {% else %}
+                <span class="badge bg-danger fs-6"><i class="bi bi-x-circle"></i> Non recommandee cette saison</span>
+            {% endif %}
+        </div>
+        <p class="small text-muted mb-1">Score de compatibilite actuel : <strong>{{ resultat.score_actuel }}/100</strong>{% if resultat.score_simule != resultat.score_actuel %} · apres amendements : <strong>{{ resultat.score_simule }}/100</strong>{% endif %}</p>
+        {% if conseil %}
+        <div class="alert alert-info mt-3 mb-0"><i class="bi bi-lightbulb"></i> {{ conseil }}</div>
+        {% endif %}
+    </div>
+
+    <div class="card p-0 mb-4 reveal">
+        <div class="card-header">Comparaison parametre par parametre</div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Parametre</th><th>Mesure</th><th>Attendu pour {{ culture_cible.nom }}</th><th>Etat</th></tr></thead>
+                <tbody>
+                {% for e in resultat.ecarts %}
+                    <tr>
+                        <td>{{ e.parametre }}</td>
+                        <td>{{ e.mesure }}</td>
+                        <td>{{ e.attendu }}</td>
+                        <td>
+                            {% if e.etat == 'conforme' %}<span class="badge bg-success">Conforme</span>
+                            {% elif e.etat == 'deficit' %}<span class="badge bg-warning text-dark">Deficit</span>
+                            {% elif e.etat == 'exces' %}<span class="badge bg-danger">Hors plage</span>
+                            {% else %}<span class="badge bg-secondary">Climat</span>{% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card p-0 mb-4 reveal">
+        <div class="card-header">Plan d'amendement propose</div>
+        {% if resultat.plan_amendement %}
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Parametre</th><th>Intrant</th><th>Quantite (kg/ha)</th><th>Cout estime (FCFA)</th><th>Delai</th></tr></thead>
+                <tbody>
+                {% for l in resultat.plan_amendement %}
+                    <tr>
+                        <td>{{ l.parametre }}</td>
+                        <td>{{ l.intrant }}</td>
+                        <td>{{ l.quantite_kg_ha|default:"—" }}</td>
+                        <td>{{ l.cout_estime_fcfa|default:"—" }}</td>
+                        <td class="small text-muted">{{ l.delai }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="fw-semibold"><td colspan="3" class="text-end">Cout total estime</td><td>{{ resultat.cout_total_estime_fcfa }} FCFA</td><td></td></tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="card-body pt-2">
+            <p class="small text-faint mb-0"><i class="bi bi-info-circle"></i> Quantites et couts sont des estimations simplifiees (meme logique que le bareme de compatibilite du Tableau 16), pas une prescription agronomique : les prix des intrants varient selon la saison, la region et le fournisseur — a verifier localement avant tout achat.</p>
+        </div>
+        {% else %}
+        <div class="card-body"><p class="mb-0 text-muted">Aucun amendement necessaire : les parametres de ce sol couvrent deja les exigences de {{ culture_cible.nom }}.</p></div>
+        {% endif %}
+    </div>
+    {% elif culture_cible %}
+        <div class="alert alert-secondary">Impossible de calculer l'ecart pour cette culture.</div>
+    {% endif %}
+</div>
+{% endblock %}

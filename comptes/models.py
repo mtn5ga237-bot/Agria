@@ -42,6 +42,11 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     telephone = models.CharField('telephone', max_length=20, blank=True)
     role = models.CharField('role', max_length=20, choices=Role.choices, default=Role.AGRICULTEUR)
 
+    # Localite declaree par l'utilisateur : zone d'intervention pour un agent vulgarisateur,
+    # lieu de residence pour un agriculteur (permet de lui proposer les agents les plus proches
+    # avant meme qu'il n'ait enregistre une parcelle). Texte libre, a l'image de Parcelle.localite.
+    localite = models.CharField('localite / zone d\'intervention', max_length=100, blank=True)
+
     # Le champ agent_vulgarisateur permet a un agent de suivre les producteurs de son secteur.
     agent_vulgarisateur = models.ForeignKey(
         'self', on_delete=models.SET_NULL, null=True, blank=True,
@@ -81,6 +86,14 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
 
     def a_le_role(self, *roles):
         return self.role in roles
+
+    def localite_effective(self):
+        """Localite a utiliser pour la mise en relation avec un agent vulgarisateur : le champ
+        declare par l'utilisateur en priorite, sinon la localite de sa parcelle la plus recente."""
+        if self.localite:
+            return self.localite
+        parcelle = self.parcelles.exclude(localite='').order_by('-date_creation').first()
+        return parcelle.localite if parcelle else ''
 
     def activer(self):
         self.is_active = True

@@ -30,6 +30,12 @@ class AgentRequisMixin(RoleRequisMixin):
     roles_autorises = ('agent',)
 
 
+class AgriculteurRequisMixin(RoleRequisMixin):
+    """Reserve aux agriculteurs (mise en relation avec un agent vulgarisateur de leur region)."""
+
+    roles_autorises = ('agriculteur',)
+
+
 class ExpertRequisMixin(RoleRequisMixin):
     roles_autorises = ('expert', 'admin')
 

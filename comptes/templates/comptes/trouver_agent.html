@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load utilitaires %}
+{% block titre %}Trouver un agent vulgarisateur{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 reveal">
+    <h1 class="h3 mb-0"><i class="bi bi-people text-success"></i> Trouver un agent vulgarisateur</h1>
+</div>
+
+<div class="card p-4 mb-4 reveal">
+    <p class="mb-2">
+        Renseigner les parametres d'une analyse (azote, phosphore, potassium, pH, temperature,
+        humidite, pluviometrie...) demande de savoir lire le francais et comprendre des termes
+        techniques. Si ce n'est pas votre cas, un <strong>agent vulgarisateur</strong> de votre
+        region peut realiser l'analyse pour vous : contactez-le directement, ou rendez-vous le
+        voir sur le terrain.
+    </p>
+    {% if localite %}
+        <p class="mb-0 text-muted small"><i class="bi bi-geo-alt"></i> Agents recherches pour la localite : <strong>{{ localite }}</strong></p>
+    {% endif %}
+    {% if agent_actuel %}
+        <div class="feature-pill mt-2"><i class="bi bi-person-check"></i> Agent actuel : {{ agent_actuel.nom_complet }}</div>
+    {% endif %}
+</div>
+
+{% if not localite %}
+    {% url 'comptes:profil' as lien_profil %}
+    <div class="row">
+        {% include "partiels/etat_vide.html" with icone="bi-geo" titre="Indiquez votre localite" message="Pour vous proposer les agents vulgarisateurs les plus proches, renseignez d'abord votre localite dans votre profil (ou enregistrez une parcelle avec sa localite)." lien_url=lien_profil lien_texte="Modifier mon profil" %}
+    </div>
+{% elif agents %}
+    <div class="row g-3">
+        {% for agent in agents %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card p-4 h-100 reveal">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="brand-icon" style="width:40px;height:40px;font-size:1.1rem;"><i class="bi bi-person-badge"></i></span>
+                    <div>
+                        <div class="fw-semibold">{{ agent.nom_complet }}</div>
+                        <div class="text-faint small">{{ agent.localite }}</div>
+                    </div>
+                </div>
+                <div class="small text-muted mb-1"><i class="bi bi-envelope"></i> {{ agent.email }}</div>
+                {% if agent.telephone %}<div class="small text-muted mb-3"><i class="bi bi-telephone"></i> {{ agent.telephone }}</div>{% endif %}
+                {% if agent_actuel.pk == agent.pk %}
+                    <span class="btn btn-sm btn-outline-success disabled mt-auto"><i class="bi bi-check-lg"></i> Deja votre agent</span>
+                {% else %}
+                    <form method="post" action="{% url 'comptes:choisir_agent' %}" class="mt-auto">
+                        {% csrf_token %}
+                        <input type="hidden" name="agent_id" value="{{ agent.pk }}">
+                        <button type="submit" class="btn btn-sm btn-success w-100"><i class="bi bi-link-45deg"></i> Choisir cet agent</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="row">
+        {% include "partiels/etat_vide.html" with icone="bi-person-x" titre="Aucun agent disponible pour le moment" message="Aucun agent vulgarisateur actif n'est encore enregistre pour votre localite. Contactez l'administration de la plateforme, ou reessayez plus tard." %}
+    </div>
+{% endif %}
+{% endblock %}

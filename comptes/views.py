@@ -18,7 +18,7 @@ from .forms import (
     FormulaireProfil, FormulaireRattacherProducteur,
 )
 from .middleware import adresse_ip_client
-from .mixins import AdministrateurRequisMixin, AgentRequisMixin
+from .mixins import AdministrateurRequisMixin, AgentRequisMixin, AgriculteurRequisMixin
 from .models import JournalActivite, Utilisateur
 
 logger = logging.getLogger('agria.securite')
@@ -256,6 +256,55 @@ class DetailProducteurView(AgentRequisMixin, DetailView):
             parcelle__proprietaire=self.object,
         ).select_related('parcelle', 'culture_predite').order_by('-date_analyse')[:20]
         return contexte
+
+
+# ---------------------------------------------------------------------------
+# Mise en relation producteur <-> agent vulgarisateur de sa region (en
+# libre-service, depuis le compte de l'agriculteur) : reponse a la barriere
+# de langue et d'alphabetisation identifiee au Dossier I, 2.3 - un producteur
+# qui ne peut pas renseigner seul les parametres techniques d'une analyse
+# doit pouvoir trouver, parmi les agents actifs, ceux de sa propre localite.
+# ---------------------------------------------------------------------------
+
+class TrouverAgentView(AgriculteurRequisMixin, ListView):
+    template_name = 'comptes/trouver_agent.html'
+    context_object_name = 'agents'
+
+    def get_queryset(self):
+        self.localite = self.request.user.localite_effective()
+        if not self.localite:
+            return Utilisateur.objects.none()
+        return Utilisateur.objects.filter(
+            role=Utilisateur.Role.AGENT, is_active=True, est_banni=False,
+            localite__icontains=self.localite,
+        ).order_by('nom_complet')
+
+    def get_context_data(self, **kwargs):
+        contexte = super().get_context_data(**kwargs)
+        contexte['localite'] = self.localite
+        contexte['agent_actuel'] = self.request.user.agent_vulgarisateur
+        return contexte
+
+
+class ChoisirAgentView(AgriculteurRequisMixin, View):
+    def post(self, request):
+        agent = get_object_or_404(
+            Utilisateur, pk=request.POST.get('agent_id'), role=Utilisateur.Role.AGENT,
+            is_active=True, est_banni=False,
+        )
+        request.user.agent_vulgarisateur = agent
+        request.user.save(update_fields=['agent_vulgarisateur'])
+        JournalActivite.objects.create(
+            utilisateur=request.user,
+            action=f"Rattachement a l'agent vulgarisateur {agent.email}",
+            adresse_ip=adresse_ip_client(request),
+        )
+        messages.success(
+            request,
+            f'{agent.nom_complet} est maintenant votre agent vulgarisateur. '
+            'Contactez-le/la pour qu\'il/elle realise une analyse pour votre compte.',
+        )
+        return redirect('comptes:trouver_agent')
 
 
 def exporter_producteurs_view(request):

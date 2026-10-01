@@ -6,7 +6,7 @@
     <title>{% block titre %}AgriA{% endblock %} — Analyse et classification des sols</title>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="app-shell-page">
 
 <nav class="topbar navbar navbar-expand-lg">
     <div class="container-fluid px-3 px-lg-4">
@@ -40,6 +40,10 @@
                 <a class="side-link {% actif_si '/parcelles/' %}" href="{% url 'parcelles:liste' %}"><i class="bi bi-bounding-box"></i> Mes parcelles</a>
                 <a class="side-link {% actif_si '/carte/' %}" href="{% url 'cartographie:carte' %}"><i class="bi bi-geo-alt"></i> Carte</a>
                 <a class="side-link {% actif_si '/analyses/historique' %}" href="{% url 'analyses:historique' %}"><i class="bi bi-clock-history"></i> Historique</a>
+
+                {% if est_agriculteur %}
+                <a class="side-link {% actif_si '/comptes/trouver-un-agent' %}" href="{% url 'comptes:trouver_agent' %}"><i class="bi bi-person-badge"></i> Trouver un agent</a>
+                {% endif %}
 
                 {% if est_agent %}
                 <div class="nav-section-label">Vulgarisation</div>

@@ -22,6 +22,10 @@ urlpatterns = [
     path('producteurs/<int:pk>/', views.DetailProducteurView.as_view(), name='detail_producteur'),
     path('producteurs/export/', views.exporter_producteurs_view, name='exporter_producteurs'),
 
+    # Mise en relation agriculteur <-> agent vulgarisateur de sa region
+    path('trouver-un-agent/', views.TrouverAgentView.as_view(), name='trouver_agent'),
+    path('trouver-un-agent/choisir/', views.ChoisirAgentView.as_view(), name='choisir_agent'),
+
     # Reinitialisation de mot de passe oublie (Dossier VII / securite des comptes).
     # Conditions requises : l'adresse doit correspondre a un compte actif disposant d'un mot de
     # passe utilisable (PasswordResetForm.get_users filtre is_active=True) ; le lien envoye par

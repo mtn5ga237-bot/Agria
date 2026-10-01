@@ -21,9 +21,15 @@ class FormulaireInscription(forms.ModelForm):
 
     class Meta:
         model = Utilisateur
-        fields = ['nom_complet', 'email', 'telephone', 'role']
+        fields = ['nom_complet', 'email', 'telephone', 'role', 'localite']
         widgets = {
             'nom_complet': forms.TextInput(attrs={'autofocus': True}),
+            'localite': forms.TextInput(attrs={'placeholder': 'Ex. Pitoa, Ngong, Lagdo...'}),
+        }
+        labels = {'localite': 'Localite (facultatif)'}
+        help_texts = {
+            'localite': "Agriculteur : votre village ou votre ville, pour qu'on vous propose un agent "
+                        'vulgarisateur proche. Agent vulgarisateur : votre zone d\'intervention.',
         }
 
     def clean_email(self):
@@ -68,7 +74,11 @@ class FormulaireProfil(forms.ModelForm):
 
     class Meta:
         model = Utilisateur
-        fields = ['nom_complet', 'telephone']
+        fields = ['nom_complet', 'telephone', 'localite']
+        widgets = {
+            'localite': forms.TextInput(attrs={'placeholder': 'Ex. Pitoa, Ngong, Lagdo...'}),
+        }
+        labels = {'localite': 'Localite / zone d\'intervention'}
 
 
 class FormulaireCreerProducteur(forms.ModelForm):

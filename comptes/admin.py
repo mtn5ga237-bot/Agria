@@ -15,7 +15,7 @@ class UtilisateurAdmin(UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Informations personnelles', {'fields': ('nom_complet', 'telephone', 'role', 'agent_vulgarisateur')}),
+        ('Informations personnelles', {'fields': ('nom_complet', 'telephone', 'role', 'localite', 'agent_vulgarisateur')}),
         ('Statut', {'fields': ('is_active', 'est_banni', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Securite', {'fields': ('tentatives_echouees', 'verrouille_jusqu_a', 'last_login', 'date_inscription')}),
     )

@@ -35,6 +35,11 @@
                             <label class="form-label">Vous etes</label>
                             {{ form.role|add_class:"form-select" }}
                         </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ form.localite.label }}</label>
+                            {{ form.localite|add_class:"form-control" }}
+                            <div class="form-text">{{ form.localite.help_text }}</div>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label">Mot de passe</label>
                             {{ form.mot_de_passe|add_class:"form-control" }}

@@ -17,6 +17,11 @@
                     {{ form.telephone|add_class:"form-control" }}
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">{{ form.localite.label }}</label>
+                    {{ form.localite|add_class:"form-control" }}
+                    <div class="form-text">{{ form.localite.help_text|default:"Utilisee pour vous proposer les agents vulgarisateurs les plus proches de chez vous." }}</div>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Adresse electronique</label>
                     <input type="text" class="form-control" value="{{ user.email }}" disabled>
                     <div class="form-text">Non modifiable ; contactez un administrateur pour la changer.</div>
