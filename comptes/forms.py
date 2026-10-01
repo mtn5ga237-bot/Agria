@@ -98,7 +98,8 @@ class FormulaireConnexion(AuthenticationForm):
         **AuthenticationForm.error_messages,
         'invalid_login': "Adresse electronique ou mot de passe incorrect, ou compte verrouille apres "
                           "plusieurs echecs. Reessayez dans quelques minutes.",
-        'inactive': "Ce compte n'est pas encore actif. Contactez un administrateur.",
+        'inactive': "Ce compte n'est pas encore actif. Contactez un administrateur a l'adresse "
+                    'admin@gmail.com pour faire activer votre compte.',
     }
 
 
