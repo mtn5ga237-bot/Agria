@@ -31,9 +31,13 @@ ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', 'localhost,1
 
 # Render (https://render.com) injecte automatiquement le nom d'hote public du service :
 # on l'ajoute aux hotes autorises et aux origines CSRF de confiance sans configuration
-# manuelle, le nom exact n'etant connu qu'apres la creation du service.
+# manuelle, le nom exact n'etant connu qu'apres la creation du service. Sans objet sur un
+# autre hebergeur (Orbit/Flux, etc.), ou le nom d'hote est fourni via ALLOWED_HOSTS et
+# CSRF_TRUSTED_ORIGINS ci-dessous.
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()
+]
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
