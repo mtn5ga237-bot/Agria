@@ -7,16 +7,21 @@ par recherche sur grille (grille reproduite ci-dessous a titre documentaire), ev
 et serialisation au format joblib.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import joblib
-import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score, classification_report, confusion_matrix, f1_score, precision_score, recall_score,
 )
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+
+if TYPE_CHECKING:  # pandas n'est importe pour de vrai qu'a l'usage, voir plus bas
+    import pandas as pd
 
 VARIABLES_BASE = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
 VARIABLES_DERIVEES = ['ratio_NK', 'indice_fertilite']
@@ -50,6 +55,8 @@ def ingenierie_variables(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def preparer_donnees(chemin_csv) -> pd.DataFrame:
+    import pandas as pd
+
     df = pd.read_csv(chemin_csv)
     df = df.drop_duplicates()
     df = df[(df['ph'] >= 0) & (df['ph'] <= 14)]
@@ -62,7 +69,14 @@ def entrainer(chemin_csv, chemin_sortie, observations_supplementaires: pd.DataFr
     Le parametre observations_supplementaires permet de fusionner des analyses validees
     par les experts pedologues au corpus d'origine, conformement au scenario de
     reentrainement decrit au Dossier III (2.3.c).
+
+    pandas n'est importe qu'ici (et dans les fonctions ci-dessus), jamais au chargement du
+    module : SoilPredictor importe VARIABLES depuis ce fichier au demarrage du serveur, et
+    pandas n'est necessaire qu'au reentrainement, pas a la prediction au quotidien - utile
+    sur un hebergement au stockage limite ou pandas n'est pas installe.
     """
+    import pandas as pd
+
     df = preparer_donnees(chemin_csv)
     if observations_supplementaires is not None and not observations_supplementaires.empty:
         df = pd.concat([df, ingenierie_variables(observations_supplementaires)], ignore_index=True)
